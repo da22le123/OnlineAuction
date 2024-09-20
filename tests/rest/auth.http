@@ -1,0 +1,24 @@
+###
+### Retrieve a token that can be used for calls requiring authentication
+###
+POST {{protocol}}{{host}}:{{port}}/auth
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "user",
+  "password": "pass"
+}
+
+> {%
+client.global.set("token", "m1jnH3l3L4ng3en5uperV31l!geT0ken");
+%}
+
+
+###
+### Invalidate the token
+###
+DELETE {{protocol}}{{host}}:{{port}}/auth
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}

@@ -1,0 +1,300 @@
+### Successfull test: get all items
+GET {{protocol}}{{host}}:{{port}}/items
+Accept:application/json
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Successfull test: get an item with existing id
+GET {{protocol}}{{host}}:{{port}}/items/1
+Accept:application/json
+
+> {%
+    client.test("Item found, status code 200", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.test("Response contains the item", function() {
+        const itemId = response.body.id;
+        client.assert(itemId!==null && itemId === 1, "Received invalid response");
+    });
+%}
+
+### Failed test: get an item with non existing id
+GET {{protocol}}{{host}}:{{port}}/items/1111
+Accept:application/json
+
+
+> {%
+    client.test("Item not found, server returns error", function () {
+        client.assert(response.status === 404, "Response status is not 404");
+    });
+    client.test("Response contains the id of the new item", function() {
+        const errorMessage = response.body.message;
+        client.assert(errorMessage!==null && errorMessage === "Item not found", "Received invalid response");
+    });
+%}
+
+### Successfull test: item gets created successfully, returned the id of the new item and correct status code.
+POST {{protocol}}{{host}}:{{port}}/items
+Accept:application/json
+Content-Type:application/json
+
+{
+  "auctionEnd": "2024-09-20T15:30:00Z",
+  "price": 2000,
+  "type": "Laptop",
+  "name": "LG",
+  "processor": "Intel i9",
+  "ram": "32GB",
+  "storage": "SSD",
+  "graphicsCard": "Integrated"
+}
+
+> {%
+    client.test("Request executed successfully, item created successfully", function () {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+    client.test("Response content type is json", function() {
+        const type = response.contentType.mimeType;
+        client.assert(type === "application/json", `Expected 'application/json' but received '${type}'`);
+    });
+    client.test("Response contains the id of the new item", function() {
+        const id = response.body.id;
+        client.assert(id!==null && typeof id === "number", "Received invalid response");
+    });
+%}
+
+### Failed test: item does not get created, validation fails, returns the error message (incorrect type)
+POST {{protocol}}{{host}}:{{port}}/items
+Accept:application/json
+Content-Type:application/json
+
+{
+  "auctionEnd": "2024-09-20T15:30:00Z",
+  "price": 2000,
+  "type": "asd",
+  "name": "LG",
+  "processor": "Intel i9",
+  "ram": "32GB",
+  "storage": "SSD",
+  "graphicsCard": "Integrated"
+}
+
+> {%
+    client.test("Request fails, item not created", function () {
+        client.assert(response.status === 400, "Response status is not 400");
+    });
+    client.test("Response content type is json", function() {
+        const type = response.contentType.mimeType;
+        client.assert(type === "application/json", `Expected 'application/json' but received '${type}'`);
+    });
+    client.test("Response contains correct error message", function() {
+        const errorMessage = response.body.error;
+        client.assert(errorMessage!==null && errorMessage === "Unsupported item type", "Received invalid response");
+    });
+%}
+
+### Failed test: item does not get created, validation fails, returns the error message (required fields are missing)
+POST {{protocol}}{{host}}:{{port}}/items
+Accept:application/json
+Content-Type:application/json
+
+{
+  "auctionEnd": "2024-09-20T15:30:00Z",
+  "price": 2000,
+  "type": "Laptop",
+  "processor": "Intel i9",
+  "ram": "32GB",
+  "storage": "SSD",
+  "graphicsCard": "Integrated"
+}
+
+> {%
+    let requiredMissingField = "name";
+
+    client.test("Request fails, item not created", function () {
+        client.assert(response.status === 400, "Response status is not 400");
+    });
+    client.test("Response content type is json", function() {
+        const type = response.contentType.mimeType;
+        client.assert(type === "application/json", `Expected 'application/json' but received '${type}'`);
+    });
+    client.test("Response contains correct error message", function() {
+        const errorMessage = response.body.error;
+        client.assert(errorMessage!==null && errorMessage === `Missing required field: ${requiredMissingField} for Laptop`, "Received invalid response");
+    });
+%}
+
+
+### Successfull test: delete an item with existing id
+//After each execution you have to change the id parameter in the url because item with such id gets deleted
+#DELETE {{protocol}}{{host}}:{{port}}/items/2
+#Accept:application/json
+#Content-Type:application/json
+#
+#> {%
+#    client.test("Request executed successfully", function () {
+#        client.assert(response.status === 200, "Response status is not 200");
+#    });
+#    client.test("Response content type is json", function() {
+#        const type = response.contentType.mimeType;
+#        client.assert(type === "application/json", `Expected 'application/json' but received '${type}'`);
+#    });
+#    client.test("Response contains correct message", function() {
+#        const message = response.body.message;
+#        client.assert(message!==null && message === 'Item deleted successfully', "Received invalid response");
+#    });
+#%}
+
+### Failed test: delete an item with non existing id
+DELETE {{protocol}}{{host}}:{{port}}/items/1111
+Accept:application/json
+Content-Type:application/json
+
+> {%
+    client.test("Item not found, server returns error", function () {
+        client.assert(response.status === 404, "Response status is not 404");
+    });
+    client.test("Response content type is json", function() {
+        const type = response.contentType.mimeType;
+        client.assert(type === "application/json", `Expected 'application/json' but received '${type}'`);
+    });
+    client.test("Response contains correct error message", function() {
+        const errorMessage = response.body.message;
+        client.assert(errorMessage!==null && errorMessage === 'Item not found', "Received invalid response");
+    });
+%}
+
+### Failed test: update an item with non existing id
+PUT {{protocol}}{{host}}:{{port}}/items/1111
+Accept:application/json
+Content-Type:application/json
+
+{
+  "id": 1,
+  "bids": [],
+  "auctionEnd": "2024-09-20T15:30:00Z",
+  "price": 3000,
+  "type": "Laptop",
+  "name": "Dell",
+  "processor": "Intel i5",
+  "ram": "8GB",
+  "storage": "SSD",
+  "graphicsCard": "Integrated"
+}
+
+> {%
+    let notFoundId = 1111;
+
+    client.test("Item not found, server returns error", function () {
+        client.assert(response.status === 404, "Response status is not 404");
+    });
+    client.test("Response content type is json", function() {
+        const type = response.contentType.mimeType;
+        client.assert(type === "application/json", `Expected 'application/json' but received '${type}'`);
+    });
+    client.test("Response contains correct error message", function() {
+        const errorMessage = response.body.message;
+        client.assert(errorMessage!==null && errorMessage === `Item with ID ${notFoundId} not found.`, "Received invalid response");
+    });
+%}
+
+### Failed test: item does not get updated, validation fails (incorrect type)
+PUT {{protocol}}{{host}}:{{port}}/items/1
+Accept:application/json
+Content-Type:application/json
+
+{
+  "id": 1,
+  "bids": [],
+  "auctionEnd": "2024-09-20T15:30:00Z",
+  "price": 3000,
+  "type": "asd",
+  "name": "Dell",
+  "processor": "Intel i5",
+  "ram": "8GB",
+  "storage": "SSD",
+  "graphicsCard": "Integrated"
+}
+
+> {%
+    client.test("Request fails, item not updated", function () {
+        client.assert(response.status === 400, "Response status is not 400");
+    });
+    client.test("Response content type is json", function() {
+        const type = response.contentType.mimeType;
+        client.assert(type === "application/json", `Expected 'application/json' but received '${type}'`);
+    });
+    client.test("Response contains correct error message", function() {
+        const errorMessage = response.body.message;
+        client.assert(errorMessage!==null && errorMessage === 'Invalid item type in the submitted data.', "Received invalid response");
+    });
+%}
+
+### Failed test: item does not get updated, validation fails (required fields are missing)
+PUT {{protocol}}{{host}}:{{port}}/items/1
+Accept:application/json
+Content-Type:application/json
+
+{
+  "id": 1,
+  "bids": [],
+  "auctionEnd": "2024-09-20T15:30:00Z",
+  "price": 3000,
+  "type": "Laptop",
+  "processor": "Intel i5",
+  "ram": "8GB",
+  "storage": "SSD",
+  "graphicsCard": "Integrated"
+}
+
+> {%
+    let requiredMissingField = "name";
+
+    client.test("Request fails, item not updated", function () {
+        client.assert(response.status === 400, "Response status is not 400");
+    });
+    client.test("Response content type is json", function() {
+        const type = response.contentType.mimeType;
+        client.assert(type === "application/json", `Expected 'application/json' but received '${type}'`);
+    });
+    client.test("Response contains correct error message", function() {
+        const errorMessage = response.body.message;
+        client.assert(errorMessage!==null && errorMessage === "Missing required field: name for Laptop", "Received invalid response");
+    });
+%}
+
+### Successfull test: update an item with existing id
+PUT {{protocol}}{{host}}:{{port}}/items/1
+Accept:application/json
+Content-Type:application/json
+
+{
+  "id": 1,
+  "bids": [],
+  "auctionEnd": "2024-09-20T15:30:00Z",
+  "price": 3000,
+  "type": "Laptop",
+  "name": "Dell",
+  "processor": "Intel i5",
+  "ram": "8GB",
+  "storage": "SSD",
+  "graphicsCard": "Integrated"
+}
+
+> {%
+    client.test("Request executed successfully, item updated", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.test("Response content type is json", function() {
+        const type = response.contentType.mimeType;
+        client.assert(type === "application/json", `Expected 'application/json' but received '${type}'`);
+    });
+    client.test("Response contains correct message", function() {
+        const message = response.body.message;
+        client.assert(message!==null && message === "Item updated successfully", "Received invalid response");
+    });
+%}
