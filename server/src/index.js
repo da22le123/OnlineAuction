@@ -1,10 +1,10 @@
 import express from 'express';
 import auth from './routes/auth.js';
 import itemsRouter from './routes/items.js';
-import cors from 'cors'
+import cors from 'cors';
 
-const app = express()
-const port = 3000
+const app = express();
+const port = 3000;
 
 app.use(express.json());
 app.use(cors());
@@ -14,5 +14,5 @@ app.use("/items", itemsRouter);
 
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+  console.log(`Example app listening on port ${port}`);
+});

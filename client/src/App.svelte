@@ -1,10 +1,12 @@
 <script>
   import logo from './assets/svelte.png'
+  import ProductSection from './components/ProductSection.svelte';
   import router from 'page';
 
   import Home from "./pages/Home.svelte";
   import About from "./pages/About.svelte";
   import Header from "./components/Header.svelte";
+
 
   let page;
   let params;

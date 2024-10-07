@@ -6,7 +6,7 @@ router.post("/", async (req, res) => {
     // For testing purposes a dummy token is returned.
     res.json({
         "token": "dummyt0k3nv4lu3!"
-    })
+    });
 });
 
 export default router;

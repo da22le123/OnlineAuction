@@ -1,12 +1,18 @@
 <script>
+    import { searchQuery } from '../stores/searchStore';
+
     export let query = "";
-    export let onSearch = (query) => {};
 
     function handleKeyPress(e) {
         if (e.key === 'Enter') {
-            onSearch(query);
+            searchQuery.set(query);  // Update the store when Enter is pressed
         }
     }
+
+    function handleSearchClick() {
+        searchQuery.set(query);  // Update the store when the search button is clicked
+    }
+
 </script>
 
 <div class="search-container">
@@ -16,7 +22,7 @@
             placeholder="Searching for..."
             on:keypress={handleKeyPress}
     />
-    <button on:click={() => onSearch(query)} aria-label="Search">
+    <button on:click={() => handleSearchClick()} aria-label="Search">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path
                     d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12 6 6 0 010-12z"

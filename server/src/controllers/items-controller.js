@@ -1,8 +1,15 @@
-import { createItem, getAllItems, getAllLaptops, getAllSneakers, findItemById, updateItem, deleteItem } from '../models/items-model.js';
+import { createItem, getAllItems, findItemById, updateItem, deleteItem } from '../models/items-model.js';
 
 // GET all items (laptops and sneakers)
 export function getAllItemsController(req, res) {
-    const items = getAllItems();  // Retrieve all items
+    const query = req.query;  // Retrieve query parameters
+    const category = query.category;  // Retrieve category parameter
+
+    // Retrieve minPrice and maxPrice from query parameters
+    const minPrice = query.minPrice ? Number(query.minPrice) : 50;
+    const maxPrice = query.maxPrice ? Number(query.maxPrice) : 4000;
+    const { category: _, minPrice: __, maxPrice: ___, like, ...filters } = query;
+    const items = getAllItems(category, filters, like, minPrice, maxPrice);  // Pass category, filters, min and max prices, and search query (like)
     res.status(200).json(items);
 }
 

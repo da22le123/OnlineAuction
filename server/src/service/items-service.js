@@ -26,6 +26,10 @@ export function validateLaptop(item) {
         }
     }
 
+    if (!isValidUrl(item.imageUrl)) {
+        throw new Error('Invalid image URL for Laptop');
+    }
+
     if (isNaN(Date.parse(item.auctionEnd))) {
         throw new Error('Invalid auctionEnd date');
     }
@@ -42,6 +46,10 @@ export function validateSneakers(item) {
         }
     }
 
+    if (!isValidUrl(item.imageUrl)) {
+        throw new Error('Invalid image URL for Laptop');
+    }
+
     if (isNaN(Date.parse(item.auctionEnd))) {
         throw new Error('Invalid auctionEnd date');
     }
@@ -50,5 +58,15 @@ export function validateSneakers(item) {
     }
     if (typeof item.size !== 'number' || item.size <= 0) {
         throw new Error('Size must be a positive number');
+    }
+}
+
+// Helper function to validate URLs
+function isValidUrl(url) {
+    try {
+        new URL(url);
+        return true;
+    } catch (_) {
+        return false;
     }
 }
