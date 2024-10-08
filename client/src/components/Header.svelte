@@ -1,7 +1,28 @@
 <script>
     import SearchBar from './SearchBar.svelte';
+    import LoginModal from './LoginModal.svelte';
+    import { token } from '../stores/authStore';  // Import the store
+
+    let showModal = false;
+    let tokenValue;
+    token.subscribe(value => {
+        tokenValue = value;
+    });
+
     let query = "";
     const serverUrl = "http://localhost:3000";
+
+    function openModal() {
+        showModal = true;
+    }
+
+    function closeModal() {
+        showModal = false;
+    }
+
+    function logout() {
+        token.set(null);  // Update store when logging out
+    }
 
     async function handleSearch(searchQuery) {
         console.log("Searching for:", searchQuery);
@@ -9,7 +30,6 @@
         const response = await fetch(`${serverUrl}/items?searchQuery=${searchQuery}`)
         const data = await response.json();
         console.log(data);
-
     }
 </script>
 
@@ -26,8 +46,14 @@
     <!-- Right Section with Wins and Login Button -->
     <div class="right">
         <div>Wins</div>
-        <button>Log in</button>
+        {#if tokenValue}
+            <button on:click={logout}>Log Out</button>
+        {:else}
+            <button on:click={openModal}>Log In</button>
+        {/if}
     </div>
+
+    <LoginModal {showModal} closeModal={closeModal} />
 </nav>
 
 <style>

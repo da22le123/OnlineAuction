@@ -6,12 +6,17 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "username": "user",
-  "password": "pass"
+  "email": "user@gmail.com",
+  "password": "password"
 }
 
 > {%
-client.global.set("token", "m1jnH3l3L4ng3en5uperV31l!geT0ken");
+client.test(
+    "Request executed successfully",
+    function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    }
+);
 %}
 
 

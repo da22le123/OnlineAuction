@@ -430,7 +430,7 @@ export function createItem(item) {
     // Generate a new unique ID across both laptops and sneakers
 
 
-    const itemId = generateNewId(laptops, sneakers);
+    const itemId = generateNewId();
     let itemObj = {
     };
     console.log('Received item:', item); // Log the incoming item
@@ -480,11 +480,12 @@ export function getAllItems(category, filters, like = '', minPrice = 50, maxPric
     // Filter based on category
     if (category==='laptops') {
         items = [...laptops];
-    } else {
-        items = [...sneakers]
+    } else if (category==='sneakers') {
+        items = [...sneakers];
+    } else{
+        items = [...laptops, ...sneakers]
     }
 
-    // If no filters and no search query (like) are provided, return all items in the category
     // If no filters and no search query (like) are provided, return all items in the category
     if (Object.keys(filters).length === 0 && !like && minPrice === 50 && maxPrice === 4000) {
         return items;
