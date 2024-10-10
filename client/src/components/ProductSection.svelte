@@ -1,5 +1,4 @@
 <script>
-    import {onMount} from "svelte";
     import ProductCard from './ProductCard.svelte';
     import Sidebar from "./Sidebar.svelte";
     import { searchQuery } from '../stores/searchStore';
@@ -19,7 +18,13 @@
                 }
             }
         );
-        products = await response.json();
+
+        let fetchedProducts = await response.json();
+
+        const now = new Date();
+
+        products = fetchedProducts.filter(product => new Date(product.auctionEnd) > now);
+
         console.log(products);
     }
 
@@ -38,11 +43,6 @@
     };
 
     let category = 'laptops';
-
-    // Call fetchProducts() when the component is mounted
-    onMount(() => {
-        fetchProducts();
-    });
 
     function buildQueryParams(filters, searchQuery = '') {
         let queryParams = new URLSearchParams();
@@ -124,6 +124,9 @@
         currentSearch = value;  // Update the search query
         fetchProducts();  // Refetch products when the search query changes
     });
+
+    // Automatically refetch products when filters, category, or searchQuery changes
+    $: fetchProducts();  // This will reactively run when filters, category, or currentSearch change
 </script>
 
 <div class="product-container">
@@ -132,6 +135,7 @@
     <div class="products-grid">
         {#each products as product (product.id)}
             <ProductCard
+                    id={product.id}
                     name={product.name}
                     price={product.price}
                     oldPrice={product.bids.length > 1 ? product.bids[product.bids.length - 2].price : null}

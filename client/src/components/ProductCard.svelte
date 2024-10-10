@@ -1,9 +1,34 @@
 <script>
+    import {onDestroy} from "svelte";
+    import {calculateTimeRemaining} from "../utils/countdown.js"; // Import calculateTimeRemaining function
+    import router from 'page'; // Import router from 'page'
+
+    export let id;
     export let name;
     export let price;
     export let oldPrice;
     export let imageUrl;
     export let auctionEnd;
+
+    let timeRemaining = '';
+
+    function navigateToProductDetail() {
+        router(`/laptops/${id}`); // Navigate to the product detail page
+    }
+
+
+    // Function to calculate time left till the auction ends
+
+
+    // Set up a timer to update the countdown
+    const interval = setInterval(() => {
+        timeRemaining = calculateTimeRemaining(auctionEnd);
+    }, 1000);
+
+    // Clear interval when component is destroyed
+    onDestroy(() => {
+        clearInterval(interval);
+    });
 
     const formatAuctionEnd = (auctionEnd) => {
         const date = new Date(auctionEnd);
@@ -20,8 +45,8 @@
                 <span class="old-price">{oldPrice}$</span>
             {/if}
             <span class="price">{price}$</span>
-            <span class="auction-end">Ends on: {formatAuctionEnd(auctionEnd)}</span>
-            <button class="buy-button">Place a bid</button>
+            <span class="auction-end">Ends in: {timeRemaining}</span>
+            <button class="buy-button" on:click={navigateToProductDetail}>See more</button>
         </div>
     </div>
 </main>

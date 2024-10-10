@@ -1,4 +1,4 @@
-import {getAllUsers, createUser, getUserByEmail} from '../models/user-model.js';
+import {getAllUsers, createUser, getUserByEmail, findUserById} from '../models/user-model.js';
 import {generateToken} from "../service/auth-service.js";
 
 export function getAllUsersController(req, res) {
@@ -30,9 +30,23 @@ export function getUserByEmailController(req, res) {
         if (user) {
             res.status(200).json(user);
         } else {
-            res.status(400).json({ message: 'Something went wrong' });
+            res.status(404).json({ message: 'User not found' });
         }
     } catch (error) {
-        res.status(404).json({ error: error.message }); //user not found
+        res.status(400).json({ error: error.message });
+    }
+}
+
+export function getUserById(req, res) {
+    try {
+        const user = findUserById(Number(req.params.id));
+        if (user) {
+            res.status(200).json(user);
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message });
     }
 }

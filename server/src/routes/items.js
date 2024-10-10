@@ -20,6 +20,9 @@ router.put('/:id',isLoggedIn, isAdmin, updateExistingItem);
 // DELETE an item by ID, check if user is logged in and is admin
 router.delete('/:id',isLoggedIn, isAdmin, deleteExistingItem);
 
+//POST post a bid /items/:id/bids
+
+
 
 
 export default router;

@@ -107,3 +107,13 @@ The login page should allow the user to log in using an e-mail address and passw
 ![](assets/register.jpeg)
 
 The registration page should allow the user to enter their personal information, so they can place bids.
+
+
+The stores used:
+
+- authStore : is used to store the token for authorization
+- searchStore : is used to store the search query from the SearchBar in the Header component because Header is directly applied in the
+    App.svelte file, for it is out of the hierarchy, and I can't pass the search query as a prop to the ProductSection where it is used to fetch the products. 
+- currentPathStore : is used to store the current path of the page, so I can use it to determine which page is currently being displayed in that same Header component which is out of the hierarchy. 
+I need it to determine whether I should display the search bar or the "GO back" button. 
+- userStore : 

@@ -1,34 +1,33 @@
 <script>
-  import logo from './assets/svelte.png'
-  import ProductSection from './components/ProductSection.svelte';
   import router from 'page';
-
+  import { currentPath } from './stores/currentPathStore.js';  // Import the store
   import Home from "./pages/Home.svelte";
-  import About from "./pages/About.svelte";
   import Header from "./components/Header.svelte";
+  import ProductDetail from "./pages/ProductDetail.svelte";
 
 
   let page;
   let params;
-  let currentRoute;
 
 
 
   router('/', (ctx) => {
     page = Home;
-    currentRoute = ctx.pathname;
+    currentPath.set(ctx.pathname);
   });
-  router('/about', (ctx) => {
-    page = About;
-    currentRoute = ctx.pathname;
-    params = ctx;
+
+  router('/laptops/:id', (ctx) => {
+    page = ProductDetail;
+    params = ctx.params;
+    currentPath.set(ctx.pathname);
   });
+
 
   router.start();
 </script>
 
 <main>
-  <Header active={currentRoute} />
+  <Header />
   <svelte:component this={page} {params} />
 </main>
 
@@ -36,10 +35,6 @@
   :root {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
       Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  }
-
-  header {
-
   }
 
   main {

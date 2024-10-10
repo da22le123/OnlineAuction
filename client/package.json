@@ -15,6 +15,7 @@
     "vite": "^4.4.9"
   },
   "dependencies": {
-    "page": "^1.11.6"
+    "page": "^1.11.6",
+    "svelte-spa-router": "^4.0.1"
   }
 }
