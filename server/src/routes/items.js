@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllItemsController, getItemById, createNewItem, updateExistingItem, deleteExistingItem } from '../controllers/items-controller.js';
+import { getAllItemsController, getItemById, createNewItem, updateExistingItem, deleteExistingItem, addBid, streamBids} from '../controllers/items-controller.js';
 import {isLoggedIn} from "../middleware/isLoggedIn.js";
 import {isAdmin} from "../middleware/isAdmin.js";
 
@@ -20,9 +20,11 @@ router.put('/:id',isLoggedIn, isAdmin, updateExistingItem);
 // DELETE an item by ID, check if user is logged in and is admin
 router.delete('/:id',isLoggedIn, isAdmin, deleteExistingItem);
 
-//POST post a bid /items/:id/bids
+//POST a bid /items/:id/bids
+router.post('/:id/bids',isLoggedIn, addBid);
 
-
+//GET a stream of bids /items/:id/bids/stream
+router.get('/:id/bids/stream',isLoggedIn, streamBids);
 
 
 export default router;

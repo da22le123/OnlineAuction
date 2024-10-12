@@ -1,4 +1,4 @@
-import { createItem, getAllItems, findItemById, updateItem, deleteItem } from '../models/items-model.js';
+import {createItem, getAllItems, findItemById, updateItem, deleteItem, addBidToTheItem, getLatestBid} from '../models/items-model.js';
 
 // GET all items (laptops and sneakers)
 export function getAllItemsController(req, res) {
@@ -66,6 +66,46 @@ export function deleteExistingItem(req, res) {
     } else {
         res.status(404).json({ message: 'Item not found' });
     }
+}
+
+//POST a bid
+export function addBid(req, res) {
+    const itemId = Number(req.params.id);
+    const bid = req.body;
+
+    // Add bid to item
+    const result = addBidToTheItem(itemId, bid);
+
+    if (result === true) {
+        res.status(200).json({ message: 'Bid added successfully' });
+    } else {
+        res.status(400).json({ result });
+    }
+}
+
+export function streamBids(req, res) {
+    const itemId = Number(req.params.id);
+
+    // Set headers for SSE
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();  // Flush headers to establish SSE
+
+    // Simulate pushing a new bid every 1 second
+    const intervalId = setInterval(() => {
+        const latestBid = getLatestBid(itemId);  // Get latest bid for the item
+        if (latestBid) {
+            res.write(`data: ${JSON.stringify(latestBid)}\n\n`);
+        }
+    }, 1000); // Every 1 second, send the latest bid
+
+    // Close connection if the client disconnects
+    req.on('close', () => {
+        clearInterval(intervalId);
+        res.end();
+    });
 }
 
 

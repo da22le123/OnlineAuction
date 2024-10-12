@@ -1,11 +1,28 @@
 <script>
     import {calculateTimeRemaining} from "../utils/countdown.js";
+    import {isBidValid, isLoggedIn} from "../utils/validation.js";
+    import {user} from "../stores/userStore.js";
+    import {token} from "../stores/authStore.js";
 
     export let params;  // Declare 'params' as a prop
     const productId = params.id;  // Get the product ID from the URL params
 
+    let tokenValue;
+    let currentUser;
+    let errorMessage = '';  // To hold any error messages
+
     let newBidAmount = 0;  // To hold the new bid amount
     let timeRemaining = '';  // To hold the countdown string
+
+    let bids = [];  // Array to store bids
+
+    token.subscribe(value => {
+        tokenValue = value;
+    });
+
+    user.subscribe(value => {
+        currentUser = value;
+    });
 
     async function fetchProductById() {
         const response = await fetch(
@@ -19,6 +36,7 @@
         );
 
         const data = await response.json();
+        bids = data.bids.slice().reverse();  // Reverse bids to show latest first
 
         const interval = setInterval(() => {
             timeRemaining = calculateTimeRemaining(data.auctionEnd);
@@ -48,14 +66,83 @@
 
     // Function to place a new bid
     function placeBid(product) {
-        console.log("Test: set new bid amount", newBidAmount, " for product ", product.name);
+        if (!isLoggedIn()) {
+            errorMessage = 'Please log in to place a bid.';
+            console.log(errorMessage); //TODO render error message
+            return;
+        }
+
+        const currentPrice = product.price;
+
+        if (isBidValid(newBidAmount, currentPrice)) {
+            // Post the bid to the server
+            postBid(product.id, newBidAmount, currentUser.id);
+
+
+            console.log("Placing bid for product ", product.id, " with amount ", newBidAmount);
+        } else {
+            console.log("Invalid bid amount for product ", product.name);
+        }
+
+    }
+
+    async function postBid(productId, newBidAmount, userIdMadeBy) {
+        const response = await fetch(
+            `http://localhost:3000/items/${productId}/bids`,
+            {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${tokenValue}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    timestamp: new Date().toISOString(),
+                    price: newBidAmount,
+                    user: userIdMadeBy
+                })
+            }
+        );
+
+
+
+        const data = await response.json();
+        console.log(data);
+        return data;
     }
 
     function trimUsername(email) {
         return email.split('@')[0];
     }
 
-    // Set up a timer to update the countdown
+    // Subscribe to the Server-Sent Events (SSE) stream for new bids
+    function startBidStreaming() {
+        const eventSource = new EventSource(`http://localhost:3000/items/${productId}/bids/stream?token=${tokenValue}`);
+
+        // Listen for new bid events
+        eventSource.onmessage = function(event) {
+            const newBid = JSON.parse(event.data);
+
+            // Only add the bid if it's newer than the last bid
+            if (bids.length === 0 || new Date(newBid.timestamp).getTime() > new Date(bids[0].timestamp).getTime()) {
+                bids = [newBid, ...bids];  // Add the new bid to the top of the list
+            }
+        };
+
+        // Handle connection closing
+        eventSource.onerror = function() {
+            console.log("Error in SSE connection.");
+            eventSource.close();  // Close the connection on error
+        };
+
+        // Handle the client manually closing the connection (e.g., leaving the page)
+        eventSource.addEventListener('close', function() {
+            console.log("Client closed the SSE connection.");
+            eventSource.close();
+        });
+    }
+
+    // Start streaming bids when the component loads
+    $: startBidStreaming();
 
 
 
@@ -104,7 +191,7 @@
             <h5 style="font-family: 'Times New Roman'; font-style: italic;">Currently winning bid has green background.</h5>
             <div class="bids-container">
                 <ul>
-                    {#each product.bids.slice().reverse() as bid, index}
+                    {#each bids as bid, index}
                         {#await fetchUserById(bid.user)}
                             <li>Loading...</li>
                         {:then user}

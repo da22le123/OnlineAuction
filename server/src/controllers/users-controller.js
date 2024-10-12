@@ -2,8 +2,19 @@ import {getAllUsers, createUser, getUserByEmail, findUserById} from '../models/u
 import {generateToken} from "../service/auth-service.js";
 
 export function getAllUsersController(req, res) {
-    const users = getAllUsers();
-    res.status(200).json(users);
+    if (req.query.email) {
+        const email = req.query.email;
+        const user = getUserByEmail(email);
+        if (user) {
+            res.status(200).json(user);
+        } else {
+            res.status(404).json({message: 'User not found'});
+        }
+    }
+    else {
+        const users = getAllUsers();
+        res.status(200).json(users);
+    }
 }
 
 export async function createNewUser(req, res) {
@@ -12,7 +23,7 @@ export async function createNewUser(req, res) {
         const userId = await createUser(newUser);
 
         if (userId) {
-            const token = generateToken(userId, newUser.email);
+            const token = generateToken(userId, newUser.email, newUser.isAdmin);
 
         res.status(201).json({message: 'User created successfully', id: userId, token});
         }

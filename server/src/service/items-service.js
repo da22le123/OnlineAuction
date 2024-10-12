@@ -70,3 +70,19 @@ function isValidUrl(url) {
         return false;
     }
 }
+
+export function validateBid(bid) {
+    const requiredFields = ['timestamp', 'price', 'user'];
+
+    for (const field of requiredFields) {
+        if (!bid[field]) {
+            throw new Error(`Missing required field: ${field} for Sneakers`);
+        }
+    }
+
+    if (typeof bid.price !== 'number' || isNaN(bid.price) || bid.price <= 0) {
+        throw new Error("Bid price must be a positive number.");
+    }
+
+
+}

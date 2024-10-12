@@ -1,4 +1,4 @@
-import {generateNewId, validateLaptop, validateSneakers} from "../service/items-service.js";
+import {generateNewId, validateBid, validateLaptop, validateSneakers} from "../service/items-service.js";
 export let laptops = [
     {
         id: 1,
@@ -599,5 +599,36 @@ export function updateItem(id, updateData) {
 
     // Return true if successfully updated
     return true;
+}
+
+export function addBidToTheItem(itemId, bid) {
+    const item = findItemById(itemId);
+    if (!item) {
+        return { message: `Item with ID ${itemId} not found.` };
+    }
+
+    // Validate the bid
+    try {
+        validateBid(bid);
+    } catch (e) {
+        return { message: e.message };
+    }
+
+    // Add the bid to the item
+    item.bids.push(bid);
+    item.price = bid.price;  // Update the price of the item
+
+    return true;
+}
+
+export function getLatestBid(productId) {
+    const item = findItemById(productId);  //get the item based on the id
+    const bids = item.bids;
+
+    if (bids.length === 0) {
+        return null;  // No bids found
+    }
+
+    return bids[bids.length - 1];  // Return the last bid (latest bid)
 }
 

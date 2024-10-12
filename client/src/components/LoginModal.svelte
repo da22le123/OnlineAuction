@@ -1,5 +1,6 @@
 <script>
     import { token } from '../stores/authStore'; // Import the token store
+    import { user } from '../stores/userStore'; // Import the user store
 
     export let showModal = false;
     export let closeModal;
@@ -24,7 +25,16 @@
         let data;
         if (response.status === 200) {
             data = await response.json();
+            const foundUser = await fetchUserByEmail(); //contains password as well, we don't want to store password in the store
+            let userData = {
+                id: foundUser.id,
+                email: foundUser.email,
+                isAdmin: foundUser.isAdmin
+            }
+
             token.set(data.token);  // Handle the JWT token here.
+            user.set(userData); // Set the user data
+
             errorMessage = '';  // Clear any previous error message
             closeModal();  // Close the modal upon successful login
         } else if (response.status === 400) {
@@ -32,6 +42,12 @@
         } else {
             errorMessage = 'An error occurred.';
         }
+    }
+
+    async function fetchUserByEmail() {
+        const response = await fetch(`http://localhost:3000/users?email=${email}`);
+        const data = await response.json();
+        return data;
     }
 
     async function registerUser() {
@@ -53,7 +69,7 @@
 
         const userId = await responseUserPost.json();
 
-        if (!userId) {
+        if (!userId.id) {
             errorMessage = 'An error occurred. User id is not returned';
             return;
         }
@@ -67,12 +83,20 @@
         let data;
         if (responseTokenPost.status === 200) {
             data = await responseTokenPost.json();
+
+            let userData = {
+                id: userId.id,
+                email: email,
+                isAdmin: isAdmin
+            }
+
             token.set(data.token);  // Handle the JWT token here.
+            user.set(userData);  // Set the user data
+
             console.log(data.token);
             closeModal();  // Close the modal upon successful login
 
             errorMessage = '';  // Clear any previous error message
-            console.log(email, password)
         }
     }
 
