@@ -12,13 +12,16 @@
     import { token } from "../stores/authStore.js";
     import {onMount} from "svelte";
     import { user } from "../stores/userStore.js";
+    import EditAuctionModal from '../components/EditAuctionModal.svelte';
     import Page from "page";
 
     let loadedAuctions = [];  // Initialize as an empty array to prevent the {#each} error
     let tokenValue;
     let currentUser;
+    let showModal = false; // Controls whether the modal is visible or not
+    let selectedAuction = {};  // Store the selected auction for editing
 
-   user.subscribe(value => {
+    user.subscribe(value => {
         currentUser = value;
     });
 
@@ -43,8 +46,35 @@
 
     // Functions to handle Edit, Delete, and Add new auctions
     function editAuction(auctionId) {
+        selectedAuction = loadedAuctions.find(auction => auction.id === auctionId);
+        showModal = true;  // Open the modal
         console.log('Edit auction', auctionId);
-        // Navigate to edit form or open modal
+    }
+
+    // Close modal
+    function closeModal() {
+        showModal = false;
+        selectedAuction = {};  // Clear selected auction when closing the modal
+    }
+
+    async function updateAuction() {
+       const response = await fetch(`http://localhost:3000/items/${selectedAuction.id}`, {
+           method: 'PUT',
+           headers: {
+               'Authorization': `Bearer ${tokenValue}`,
+               'Content-Type': 'application/json'
+           },
+           body: JSON.stringify(selectedAuction)
+       });
+
+       if (response.ok) {
+           alert('Auction updated successfully');
+           loadedAuctions = await fetchAuctions();
+           closeModal();
+       } else {
+           const errorMsg = await response.json();
+           alert('Failed to update auction ' + errorMsg.message);
+       }
     }
 
     async function deleteAuction(auctionId) {
@@ -109,6 +139,15 @@
         {/each}
         </tbody>
     </table>
+
+    {#if showModal === true}
+        <EditAuctionModal
+            {showModal}
+            {selectedAuction}
+            {closeModal}
+            {updateAuction}
+        />
+    {/if}
 </main>
 
 <style>

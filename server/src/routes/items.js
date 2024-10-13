@@ -14,7 +14,7 @@ router.get('/:id', getItemById);
 // POST create a new item, check if user is logged in and is admin
 router.post('/',isLoggedIn, isAdmin, createNewItem);
 
-// PATCH update an existing item, check if user is logged in and is admin
+// PUT update an existing item, check if user is logged in and is admin
 router.put('/:id',isLoggedIn, isAdmin, updateExistingItem);
 
 // DELETE an item by ID, check if user is logged in and is admin
