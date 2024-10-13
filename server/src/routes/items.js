@@ -24,7 +24,7 @@ router.delete('/:id',isLoggedIn, isAdmin, deleteExistingItem);
 router.post('/:id/bids',isLoggedIn, addBid);
 
 //GET a stream of bids /items/:id/bids/stream
-router.get('/:id/bids/stream',isLoggedIn, streamBids);
+router.get('/:id/bids/stream', streamBids);
 
 
 export default router;

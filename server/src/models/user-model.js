@@ -30,7 +30,6 @@ export async function createUser(user) {
     const userId = generateNewId();
 
     let userObj = {};
-    console.log('Received user:', user);
 
     const userPassword = user.password;
     let hashedPassword;
@@ -43,7 +42,6 @@ export async function createUser(user) {
         password: hashedPassword,
         isAdmin: user.isAdmin
     }
-    console.log("Hashpassw", hashedPassword);
     validateUser(userObj);
     users.push(userObj);
 
@@ -52,8 +50,6 @@ export async function createUser(user) {
 
 export function getUserByEmail(email) {
     let user = users.find(user => user.email === email);
-
-    console.log("getUserByEmail(): ", user)
 
     if (user === null || user === undefined) {
         throw new Error("User not found");

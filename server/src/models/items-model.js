@@ -536,6 +536,7 @@ export function getAllSneakers(){
 // If the item exists, it filters the array to remove it, then returns
 // true to indicate the item was successfully deleted.
 export function deleteItem(id) {
+    console.log("deleteItem() in items-model.js called with id:", id);
     const foundItem = findItemById(id);  // Check if the item exists
 
     if (foundItem === null) {

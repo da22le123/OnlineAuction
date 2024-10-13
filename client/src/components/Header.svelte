@@ -3,9 +3,10 @@
     import LoginModal from './LoginModal.svelte';
     import { token } from '../stores/authStore';
     import {currentPath} from "../stores/currentPathStore.js";
+    import { user } from "../stores/userStore.js";
     import router from 'page';
 
-
+    let currentUser;
     let showModal = false;
     let tokenValue;
     let activeRoute = '/';  // Initialize the route with the default
@@ -17,6 +18,10 @@
     // Subscribe to the current route store
     currentPath.subscribe(value => {
         activeRoute = value;  // Update the activeRoute whenever the route changes
+    });
+
+    user.subscribe(value => {
+        currentUser = value;
     });
 
     let query = "";
@@ -32,6 +37,8 @@
 
     function logout() {
         token.set(null);  // Update store when logging out
+        user.set(null);   // Clear user data
+        router('/');      // Optionally redirect to the home page after logging out
     }
 
     async function handleSearch(searchQuery) {
@@ -47,6 +54,9 @@
         router('/');
     }
 
+    function goToAdminDashboard() {
+        router('/admin');  // Navigate to the Admin Dashboard
+    }
 
 </script>
 
@@ -58,7 +68,7 @@
     </div>
 
     <!-- Conditionally show search bar or go-back button based on route -->
-    {#if !activeRoute.includes('/laptops/')}
+    {#if !activeRoute.includes('/laptops/') && !activeRoute.includes('/admin') }
         <!-- SearchBar Component in the Middle -->
         <SearchBar bind:query={query} on:Search={handleSearch} />
     {:else}
@@ -70,6 +80,14 @@
 
     <!-- Right Section with Wins and Login Button -->
     <div class="right">
+
+        <!-- Conditionally display Admin Dashboard button -->
+        {#if currentUser && currentUser.isAdmin && !activeRoute.includes('/admin')}
+            <div class="admin-button">
+                <button on:click={goToAdminDashboard}>Admin Dashboard</button>
+            </div>
+        {/if}
+
         <div>Wins</div>
         {#if tokenValue}
             <button on:click={logout}>Log Out</button>
@@ -128,6 +146,23 @@
     }
 
     .back-button:hover {
+        background-color: #3700b3;
+    }
+
+    .admin-button {
+        margin-right: 10px;
+    }
+
+    .admin-button button {
+        padding: 8px 12px;
+        background-color: #6200ee;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .admin-button button:hover {
         background-color: #3700b3;
     }
 

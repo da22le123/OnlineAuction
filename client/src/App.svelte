@@ -4,6 +4,7 @@
   import Home from "./pages/Home.svelte";
   import Header from "./components/Header.svelte";
   import ProductDetail from "./pages/ProductDetail.svelte";
+  import AdminDashboard from "./pages/AdminDashboard.svelte";
 
 
   let page;
@@ -21,6 +22,13 @@
     params = ctx.params;
     currentPath.set(ctx.pathname);
   });
+
+  router('/admin', (ctx) => {
+    page = AdminDashboard;
+    params = ctx.params;
+    currentPath.set(ctx.pathname);
+  });
+
 
 
   router.start();

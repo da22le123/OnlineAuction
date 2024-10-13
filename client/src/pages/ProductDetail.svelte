@@ -68,7 +68,6 @@
     function placeBid(product) {
         if (!isLoggedIn()) {
             errorMessage = 'Please log in to place a bid.';
-            console.log(errorMessage); //TODO render error message
             return;
         }
 
@@ -80,8 +79,9 @@
 
 
             console.log("Placing bid for product ", product.id, " with amount ", newBidAmount);
+            errorMessage = "";
         } else {
-            console.log("Invalid bid amount for product ", product.name);
+            errorMessage = "Invalid bid amount for product ", product.name;
         }
 
     }
@@ -116,7 +116,7 @@
 
     // Subscribe to the Server-Sent Events (SSE) stream for new bids
     function startBidStreaming() {
-        const eventSource = new EventSource(`http://localhost:3000/items/${productId}/bids/stream?token=${tokenValue}`);
+        const eventSource = new EventSource(`http://localhost:3000/items/${productId}/bids/stream`);
 
         // Listen for new bid events
         eventSource.onmessage = function(event) {
@@ -204,6 +204,12 @@
                     {/each}
                 </ul>
             </div>
+
+            <!-- Display error message if present -->
+            {#if errorMessage}
+                <p class="error-message">{errorMessage}</p>
+            {/if}
+
             <div class="bid-section">
                 <input type="number" bind:value={newBidAmount} min={product.price} placeholder="Place your bid" />
                 <button on:click={() => placeBid(product)}>Place Bid</button>
@@ -318,5 +324,11 @@
 
     .bid-section button:hover {
         background-color: #3700b3;
+    }
+
+    .error-message {
+        color: red;
+        font-weight: bold;
+        margin-bottom: 10px;
     }
 </style>
