@@ -13,12 +13,14 @@
     import {onMount} from "svelte";
     import { user } from "../stores/userStore.js";
     import EditAuctionModal from '../components/EditAuctionModal.svelte';
+    import AddAuctionModal from '../components/AddAuctionModal.svelte';  // Import the AddAuctionModal component
     import Page from "page";
 
     let loadedAuctions = [];  // Initialize as an empty array to prevent the {#each} error
     let tokenValue;
     let currentUser;
-    let showModal = false; // Controls whether the modal is visible or not
+    let showEditModal = false; // Controls whether the edit modal is visible or not
+    let showAddModal = false;  // Controls whether the add modal is visible or not
     let selectedAuction = {};  // Store the selected auction for editing
 
     user.subscribe(value => {
@@ -44,17 +46,27 @@
         return data;
     }
 
-    // Functions to handle Edit, Delete, and Add new auctions
+    // Handle adding a new auction
+    function addAuction() {
+        showAddModal = true;  // Open the modal
+        console.log('Add auction');
+    }
+
+    // Function to handle Editing of auctions
     function editAuction(auctionId) {
         selectedAuction = loadedAuctions.find(auction => auction.id === auctionId);
-        showModal = true;  // Open the modal
+        showEditModal = true;  // Open the modal
         console.log('Edit auction', auctionId);
     }
 
-    // Close modal
-    function closeModal() {
-        showModal = false;
+    // Close edit modal
+    function closeEditModal() {
+        showEditModal = false;
         selectedAuction = {};  // Clear selected auction when closing the modal
+    }
+
+    function closeAddModal() {
+        showAddModal = false;
     }
 
     async function updateAuction() {
@@ -70,11 +82,31 @@
        if (response.ok) {
            alert('Auction updated successfully');
            loadedAuctions = await fetchAuctions();
-           closeModal();
+           closeEditModal();
        } else {
            const errorMsg = await response.json();
            alert('Failed to update auction ' + errorMsg.message);
        }
+    }
+
+    async function postNewAuction(newAuction) {
+        const response = await fetch(`http://localhost:3000/items`, {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${tokenValue}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(newAuction)
+        });
+
+        if (response.ok) {
+            // Refresh the auction list after adding
+            loadedAuctions = await fetchAuctions();
+            alert('Auction added successfully');
+        } else {
+            const errMsg = await response.json();
+            alert(errMsg.error);
+        }
     }
 
     async function deleteAuction(auctionId) {
@@ -100,11 +132,6 @@
         } else {
             console.error('Failed to delete auction');
         }
-    }
-
-    function addAuction() {
-        console.log('Add new auction');
-        // Navigate to add new auction form or open modal
     }
 </script>
 
@@ -140,12 +167,20 @@
         </tbody>
     </table>
 
-    {#if showModal === true}
+    {#if showEditModal === true}
         <EditAuctionModal
-            {showModal}
+            {showEditModal}
             {selectedAuction}
-            {closeModal}
+            {closeEditModal}
             {updateAuction}
+        />
+    {/if}
+
+    {#if showAddModal === true}
+        <AddAuctionModal
+                {showAddModal}
+                {closeAddModal}
+                {postNewAuction}
         />
     {/if}
 </main>

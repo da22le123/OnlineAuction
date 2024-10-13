@@ -428,13 +428,8 @@ export let sneakers = [
 
 export function createItem(item) {
     // Generate a new unique ID across both laptops and sneakers
-
-
     const itemId = generateNewId();
-    let itemObj = {
-    };
-    console.log('Received item:', item); // Log the incoming item
-
+    let itemObj;
     if (item.type === "Laptop") {
         itemObj = {
             id: itemId,
@@ -536,7 +531,6 @@ export function getAllSneakers(){
 // If the item exists, it filters the array to remove it, then returns
 // true to indicate the item was successfully deleted.
 export function deleteItem(id) {
-    console.log("deleteItem() in items-model.js called with id:", id);
     const foundItem = findItemById(id);  // Check if the item exists
 
     if (foundItem === null) {
@@ -616,6 +610,11 @@ export function addBidToTheItem(itemId, bid) {
 
 export function getLatestBid(productId) {
     const item = findItemById(productId);  //get the item based on the id
+
+    if (!item) {
+        return null;  // No item found
+    }
+
     const bids = item.bids;
 
     if (bids.length === 0) {

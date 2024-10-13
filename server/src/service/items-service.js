@@ -2,7 +2,7 @@ import {getAllItems} from "../models/items-model.js";
 
 // Function to generate a new ID based on the lowest available or the next highest
 export function generateNewId() {
-    const allItems = getAllItems();
+    const allItems = getAllItems('all', {});
 
     // Extract IDs from all items and sort them
     const existingIds = allItems.map(item => item.id).sort((a, b) => a - b);

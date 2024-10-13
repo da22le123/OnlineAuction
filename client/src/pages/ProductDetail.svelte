@@ -1,8 +1,9 @@
 <script>
-    import {calculateTimeRemaining} from "../utils/countdown.js";
+    import {calculateTimeRemaining} from "../utils/date-time.js";
     import {isBidValid, isLoggedIn} from "../utils/validation.js";
     import {user} from "../stores/userStore.js";
     import {token} from "../stores/authStore.js";
+    import {onDestroy, onMount} from "svelte";
 
     export let params;  // Declare 'params' as a prop
     const productId = params.id;  // Get the product ID from the URL params
@@ -14,7 +15,13 @@
     let newBidAmount = 0;  // To hold the new bid amount
     let timeRemaining = '';  // To hold the countdown string
 
+    let eventSource;
+
     let bids = [];  // Array to store bids
+
+    onMount(() => {
+        bids=[];
+    });
 
     token.subscribe(value => {
         tokenValue = value;
@@ -36,7 +43,7 @@
         );
 
         const data = await response.json();
-        bids = data.bids.slice().reverse();  // Reverse bids to show latest first
+        bids = [...data.bids].reverse();  // Reverse bids to show latest first
 
         const interval = setInterval(() => {
             timeRemaining = calculateTimeRemaining(data.auctionEnd);
@@ -78,7 +85,6 @@
             postBid(product.id, newBidAmount, currentUser.id);
 
 
-            console.log("Placing bid for product ", product.id, " with amount ", newBidAmount);
             errorMessage = "";
         } else {
             errorMessage = "Invalid bid amount for product ", product.name;
@@ -96,7 +102,7 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    timestamp: new Date().toISOString(),
+                    timestamp: new Date().toISOString().slice(0, 16),
                     price: newBidAmount,
                     user: userIdMadeBy
                 })
@@ -106,7 +112,6 @@
 
 
         const data = await response.json();
-        console.log(data);
         return data;
     }
 
@@ -116,33 +121,53 @@
 
     // Subscribe to the Server-Sent Events (SSE) stream for new bids
     function startBidStreaming() {
-        const eventSource = new EventSource(`http://localhost:3000/items/${productId}/bids/stream`);
+        if (eventSource){
+            eventSource.close(); // Close previous EventSource before creating a new one
+        }
+
+        eventSource = new EventSource(`http://localhost:3000/items/${productId}/bids/stream`);
 
         // Listen for new bid events
         eventSource.onmessage = function(event) {
             const newBid = JSON.parse(event.data);
 
             // Only add the bid if it's newer than the last bid
-            if (bids.length === 0 || new Date(newBid.timestamp).getTime() > new Date(bids[0].timestamp).getTime()) {
+            if (bids.length === 0 || newBid.price !== bids[0].price) {
                 bids = [newBid, ...bids];  // Add the new bid to the top of the list
             }
         };
 
         // Handle connection closing
         eventSource.onerror = function() {
-            console.log("Error in SSE connection.");
+            errorMessage = "Error in SSE connection.";
             eventSource.close();  // Close the connection on error
         };
 
         // Handle the client manually closing the connection (e.g., leaving the page)
         eventSource.addEventListener('close', function() {
-            console.log("Client closed the SSE connection.");
+            errorMessage = "Client closed the SSE connection.";
             eventSource.close();
         });
     }
 
+    // Ensure SSE closes properly
+    function cleanUpSSE() {
+        if (eventSource) {
+            console.log('Closing EventSource onDestroy');
+            eventSource.close();
+        }
+    }
+
+    onDestroy(() => {
+        cleanUpSSE();
+    });
+
     // Start streaming bids when the component loads
-    $: startBidStreaming();
+    $: if (productId) {
+        cleanUpSSE(); // Ensure previous SSE is closed
+        fetchProductById(); // Fetch the product details
+        startBidStreaming(); // Start SSE streaming for the current product
+    }
 
 
 

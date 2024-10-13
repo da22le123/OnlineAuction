@@ -18,3 +18,7 @@ export function calculateTimeRemaining(endTime) {
     }
     return `${hours}h ${minutes}m ${seconds}s`;
 }
+
+export function getCurrentDateNTime() {// Get the current date and time in the correct format for min attribute
+    return new Date().toISOString().slice(0, 16);
+}

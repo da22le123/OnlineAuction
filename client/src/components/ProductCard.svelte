@@ -1,6 +1,6 @@
 <script>
     import {onDestroy} from "svelte";
-    import {calculateTimeRemaining} from "../utils/countdown.js"; // Import calculateTimeRemaining function
+    import {calculateTimeRemaining} from "../utils/date-time.js"; // Import calculateTimeRemaining function
     import router from 'page'; // Import router from 'page'
 
     export let id;
