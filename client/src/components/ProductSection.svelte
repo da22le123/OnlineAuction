@@ -22,45 +22,30 @@
         let fetchedProducts = await response.json();
 
         const now = new Date();
-
         products = fetchedProducts.filter(product => new Date(product.auctionEnd) > now);
 
         console.log(products);
     }
 
     let filters = {
-        laptops: {
-            name: [],
-            processor: [],
-            ram: [],
-            storage: [],
-            graphicsCard: []
-        },
-        sneakers: {
-            size: [],
-            color: []
-        }
+        name: [],
+        processor: [],
+        ram: [],
+        storage: [],
+        graphicsCard: []
     };
-
-    let category = 'laptops';
 
     function buildQueryParams(filters, searchQuery = '') {
         let queryParams = new URLSearchParams();
 
-        // Add the selected category to the query string
-        queryParams.append('category', category);
-
-        // Ensure filters[category] exists
-        if (filters[category]) {
-            Object.keys(filters[category]).forEach(key => {
-                // Only include the filter if there are selected values (i.e., not empty arrays)
-                if (filters[category][key] && filters[category][key].length > 0) {
-                    filters[category][key].forEach(value => {
-                        queryParams.append(key, value);  // Add each selected value to the query
-                    });
-                }
-            });
-        }
+        // Iterate over the filters and add only selected ones to the query string
+        Object.keys(filters).forEach(key => {
+            if (filters[key] && filters[key].length > 0) {
+                filters[key].forEach(value => {
+                    queryParams.append(key, value);
+                });
+            }
+        });
 
         // Check if price filter exists and add min and max to the query
         if (filters.price) {
@@ -78,43 +63,12 @@
 
     // Function to handle changes in filters coming from Sidebar
     function handleFilterChange(updatedFilters) {
-        // Immutable update: Merge updatedFilters with the existing filters
-        filters = {
-            ...filters, // Preserve existing filters
-            [category]: {
-                ...filters[category], // Preserve existing filters for the current category
-                ...updatedFilters[category]  // Only update the specific category that changed
-            }
-        };
-
-        //console.log('Updated Filters in ProductSection:', filters); // Log updated filters
-        fetchProducts();  // Refetch products when filters are updated
-    }
-
-    // Function to handle category change and reset filters
-    function handleCategoryChange(event) {
-        const newCategory = event.detail;  // Get the category from the event's detail field
-
-        // Reset filters when the category changes
         filters = {
             ...filters,
-            [newCategory]: {  // Reset the filters for the new category
-                name: [],
-                processor: [],
-                ram: [],
-                storage: [],
-                graphicsCard: [],
-                size: [],
-                color: []
-            }
+            ...updatedFilters  // Update the specific filters that changed
         };
 
-        category = newCategory;  // Update the category
-
-        // console.log('Category changed to:', category); // Log the new category
-        // console.log('Filters reset:', filters); // Log the reset filters
-
-        fetchProducts();  // Fetch products for the new category with reset filters
+        fetchProducts();  // Refetch products when filters are updated
     }
 
     // Reset the search query by updating the search store
@@ -125,12 +79,12 @@
         fetchProducts();  // Refetch products when the search query changes
     });
 
-    // Automatically refetch products when filters, category, or searchQuery changes
-    $: fetchProducts();  // This will reactively run when filters, category, or currentSearch change
+    // Automatically refetch products when filters, or searchQuery changes
+    $: fetchProducts();  // This will reactively run when filters or currentSearch change
 </script>
 
 <div class="product-container">
-    <Sidebar {category} {filters} on:filterChange={handleFilterChange} on:categoryChange={handleCategoryChange}/>
+    <Sidebar {filters} on:filterChange={handleFilterChange}/>
 
     <div class="products-grid">
         {#each products as product (product.id)}
@@ -157,7 +111,5 @@
         grid-auto-rows: minmax(100px, auto);
         gap: 20px;
         width: 100%;
-        /*justify-content: space-between;*/
-        /*align-items: stretch; !* Ensures each card has equal height *!*/
     }
 </style>

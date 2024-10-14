@@ -6,7 +6,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "email": "user@gmail.com",
+  "email": "admin@gmail.com",
   "password": "password"
 }
 
@@ -17,13 +17,11 @@ client.test(
         client.assert(response.status === 200, "Response status is not 200");
     }
 );
+
+client.test(
+    "Response body contains a token",
+    function() {
+        client.assert(response.body.token !== undefined, "Token not found in response body");
+    }
+);
 %}
-
-
-###
-### Invalidate the token
-###
-DELETE {{protocol}}{{host}}:{{port}}/auth
-Content-Type: application/json
-Accept: application/json
-Authorization: Bearer {{token}}

@@ -5,6 +5,7 @@
   import Header from "./components/Header.svelte";
   import ProductDetail from "./pages/ProductDetail.svelte";
   import AdminDashboard from "./pages/AdminDashboard.svelte";
+  import WonAuctions from "./pages/WonAuctions.svelte";
 
 
   let page;
@@ -25,6 +26,12 @@
 
   router('/admin', (ctx) => {
     page = AdminDashboard;
+    params = ctx.params;
+    currentPath.set(ctx.pathname);
+  });
+
+  router('/won-auctions', (ctx) => {
+    page = WonAuctions;
     params = ctx.params;
     currentPath.set(ctx.pathname);
   });

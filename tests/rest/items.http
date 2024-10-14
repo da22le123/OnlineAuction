@@ -1,3 +1,5 @@
+// restart the server before running the tests
+
 ### Successfull test: get all items
 GET {{protocol}}{{host}}:{{port}}/items
 Accept:application/json
@@ -37,13 +39,63 @@ Accept:application/json
     });
 %}
 
+### Failed test: get an won auctions without Authorization header
+GET {{protocol}}{{host}}:{{port}}/items/wins/1
+Accept:application/json
+Content-Type: application/json
+
+> {%
+    client.test("Request failed", function () {
+        client.assert(response.status === 401, "Response status is not 401");
+    });
+    client.test("Response contains correct message", function() {
+        const message = response.body;
+        client.assert(message!==null && message === "Unauthorized", "Received invalid response");
+    });
+
+%}
+
+### Successfull test: get an won auctions with Authorization header
+GET {{protocol}}{{host}}:{{port}}/items/wins/1
+Accept:application/json
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJFbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImlzQWRtaW4iOnRydWUsImlhdCI6MTcyODg1NTUwOH0.lxsa9q6j80EckyTUztevuNd7Y8uEyG81lZXnOS5CdXo
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+
+    client.test("Response contains the won auctions", function() {
+        const wonAuctions = response.body;
+        client.assert(wonAuctions!==null && wonAuctions.length > 0, "Received invalid response");
+    });
+%}
+
+### Failed test: get an won auctions with non existing id
+GET {{protocol}}{{host}}:{{port}}/items/wins/1111
+Accept:application/json
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJFbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImlzQWRtaW4iOnRydWUsImlhdCI6MTcyODg1NTUwOH0.lxsa9q6j80EckyTUztevuNd7Y8uEyG81lZXnOS5CdXo
+
+> {%
+    client.test("Item not found, server returns error", function () {
+        client.assert(response.status === 404, "Response status is not 404");
+    });
+    client.test("Response contains the id of the new item", function() {
+        const errorMessage = response.body.message;
+        client.assert(errorMessage!==null && errorMessage === "No won auctions found for this user.", "Received invalid response");
+    });
+%}
+
 ### Successfull test: item gets created successfully, returned the id of the new item and correct status code.
 POST {{protocol}}{{host}}:{{port}}/items
 Accept:application/json
 Content-Type:application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJFbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImlzQWRtaW4iOnRydWUsImlhdCI6MTcyODg1NTUwOH0.lxsa9q6j80EckyTUztevuNd7Y8uEyG81lZXnOS5CdXo
 
 {
-  "auctionEnd": "2024-09-20T15:30:00Z",
+  "auctionEnd": "2024-09-20T15:30:00",
   "price": 2000,
   "type": "Laptop",
   "name": "LG",
@@ -71,6 +123,7 @@ Content-Type:application/json
 POST {{protocol}}{{host}}:{{port}}/items
 Accept:application/json
 Content-Type:application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJFbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImlzQWRtaW4iOnRydWUsImlhdCI6MTcyODg1NTUwOH0.lxsa9q6j80EckyTUztevuNd7Y8uEyG81lZXnOS5CdXo
 
 {
   "auctionEnd": "2024-09-20T15:30:00Z",
@@ -101,6 +154,7 @@ Content-Type:application/json
 POST {{protocol}}{{host}}:{{port}}/items
 Accept:application/json
 Content-Type:application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJFbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImlzQWRtaW4iOnRydWUsImlhdCI6MTcyODg1NTUwOH0.lxsa9q6j80EckyTUztevuNd7Y8uEyG81lZXnOS5CdXo
 
 {
   "auctionEnd": "2024-09-20T15:30:00Z",
@@ -124,16 +178,45 @@ Content-Type:application/json
     });
     client.test("Response contains correct error message", function() {
         const errorMessage = response.body.error;
-        client.assert(errorMessage!==null && errorMessage === `Missing required field: ${requiredMissingField} for Laptop`, "Received invalid response");
+        client.assert(errorMessage!==null && errorMessage === `Missing required field: ${requiredMissingField} for item`, "Received invalid response");
     });
 %}
 
+
+### Failed test: create an item without Authorization header
+POST {{protocol}}{{host}}:{{port}}/items
+Accept:application/json
+Content-Type:application/json
+
+{
+  "auctionEnd": "2024-09-20T15:30:00",
+  "price": 2000,
+  "type": "Laptop",
+  "name": "LG",
+  "processor": "Intel i9",
+  "ram": "32GB",
+  "storage": "SSD",
+  "graphicsCard": "Integrated"
+}
+
+> {%
+    client.test("Request failed, item not created, item created successfully", function () {
+        client.assert(response.status === 401, "Response status is not 401");
+    });
+
+    client.test("Response contains correct message", function() {
+        const message = response.body;
+        client.assert(message!==null && message === "Unauthorized", "Received invalid response");
+    });
+%}
 
 ### Successfull test: delete an item with existing id
 //After each execution you have to change the id parameter in the url because item with such id gets deleted
 #DELETE {{protocol}}{{host}}:{{port}}/items/2
 #Accept:application/json
 #Content-Type:application/json
+#Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJFbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImlzQWRtaW4iOnRydWUsImlhdCI6MTcyODg1NTUwOH0.lxsa9q6j80EckyTUztevuNd7Y8uEyG81lZXnOS5CdXo
+#
 #
 #> {%
 #    client.test("Request executed successfully", function () {
@@ -153,6 +236,8 @@ Content-Type:application/json
 DELETE {{protocol}}{{host}}:{{port}}/items/1111
 Accept:application/json
 Content-Type:application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJFbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImlzQWRtaW4iOnRydWUsImlhdCI6MTcyODg1NTUwOH0.lxsa9q6j80EckyTUztevuNd7Y8uEyG81lZXnOS5CdXo
+
 
 > {%
     client.test("Item not found, server returns error", function () {
@@ -168,15 +253,33 @@ Content-Type:application/json
     });
 %}
 
+### Failed test: delete an item without Authorization header
+DELETE {{protocol}}{{host}}:{{port}}/items/1
+Accept:application/json
+Content-Type:application/json
+
+> {%
+    client.test("Request fails, item not deleted", function () {
+        client.assert(response.status === 401, "Response status is not 401");
+    });
+    client.test("Response contains correct message", function() {
+        const message = response.body;
+        client.assert(message!==null && message === "Unauthorized", "Received invalid response");
+    });
+%}
+
+
 ### Failed test: update an item with non existing id
 PUT {{protocol}}{{host}}:{{port}}/items/1111
 Accept:application/json
 Content-Type:application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJFbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImlzQWRtaW4iOnRydWUsImlhdCI6MTcyODg1NTUwOH0.lxsa9q6j80EckyTUztevuNd7Y8uEyG81lZXnOS5CdXo
+
 
 {
   "id": 1,
   "bids": [],
-  "auctionEnd": "2024-09-20T15:30:00Z",
+  "auctionEnd": "2024-09-20T15:30:00",
   "price": 3000,
   "type": "Laptop",
   "name": "Dell",
@@ -202,42 +305,12 @@ Content-Type:application/json
     });
 %}
 
-### Failed test: item does not get updated, validation fails (incorrect type)
-PUT {{protocol}}{{host}}:{{port}}/items/1
-Accept:application/json
-Content-Type:application/json
-
-{
-  "id": 1,
-  "bids": [],
-  "auctionEnd": "2024-09-20T15:30:00Z",
-  "price": 3000,
-  "type": "asd",
-  "name": "Dell",
-  "processor": "Intel i5",
-  "ram": "8GB",
-  "storage": "SSD",
-  "graphicsCard": "Integrated"
-}
-
-> {%
-    client.test("Request fails, item not updated", function () {
-        client.assert(response.status === 400, "Response status is not 400");
-    });
-    client.test("Response content type is json", function() {
-        const type = response.contentType.mimeType;
-        client.assert(type === "application/json", `Expected 'application/json' but received '${type}'`);
-    });
-    client.test("Response contains correct error message", function() {
-        const errorMessage = response.body.message;
-        client.assert(errorMessage!==null && errorMessage === 'Invalid item type in the submitted data.', "Received invalid response");
-    });
-%}
-
 ### Failed test: item does not get updated, validation fails (required fields are missing)
 PUT {{protocol}}{{host}}:{{port}}/items/1
 Accept:application/json
 Content-Type:application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJFbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImlzQWRtaW4iOnRydWUsImlhdCI6MTcyODg1NTUwOH0.lxsa9q6j80EckyTUztevuNd7Y8uEyG81lZXnOS5CdXo
+
 
 {
   "id": 1,
@@ -263,7 +336,7 @@ Content-Type:application/json
     });
     client.test("Response contains correct error message", function() {
         const errorMessage = response.body.message;
-        client.assert(errorMessage!==null && errorMessage === "Missing required field: name for Laptop", "Received invalid response");
+        client.assert(errorMessage!==null && errorMessage === "Missing required field: name for item", "Received invalid response");
     });
 %}
 
@@ -271,11 +344,13 @@ Content-Type:application/json
 PUT {{protocol}}{{host}}:{{port}}/items/1
 Accept:application/json
 Content-Type:application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJFbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImlzQWRtaW4iOnRydWUsImlhdCI6MTcyODg1NTUwOH0.lxsa9q6j80EckyTUztevuNd7Y8uEyG81lZXnOS5CdXo
+
 
 {
   "id": 1,
   "bids": [],
-  "auctionEnd": "2024-09-20T15:30:00Z",
+  "auctionEnd": "2024-09-20T15:30:00",
   "price": 3000,
   "type": "Laptop",
   "name": "Dell",
@@ -298,3 +373,33 @@ Content-Type:application/json
         client.assert(message!==null && message === "Item updated successfully", "Received invalid response");
     });
 %}
+
+### Failed test: update an item without the Authorization header
+PUT {{protocol}}{{host}}:{{port}}/items/1
+Accept:application/json
+Content-Type:application/json
+
+{
+  "id": 1,
+  "bids": [],
+  "auctionEnd": "2024-09-20T15:30:00",
+  "price": 3000,
+  "type": "Laptop",
+  "name": "Dell",
+  "processor": "Intel i5",
+  "ram": "8GB",
+  "storage": "SSD",
+  "graphicsCard": "Integrated"
+}
+
+> {%
+    client.test("Request fails, item not updated", function () {
+        client.assert(response.status === 401, "Response status is not 401");
+    });
+    client.test("Response contains correct message", function() {
+        const message = response.body;
+        client.assert(message!==null && message === "Unauthorized", "Received invalid response");
+    });
+%}
+
+

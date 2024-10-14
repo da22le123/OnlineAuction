@@ -1,4 +1,4 @@
-import {generateNewId, validateBid, validateLaptop, validateSneakers} from "../service/items-service.js";
+import {generateNewId, validateBid, validateItem} from "../service/items-service.js";
 export let laptops = [
     {
         id: 1,
@@ -389,97 +389,40 @@ export let laptops = [
     }
 ];
 
-export let sneakers = [
-{
-    id: 11,
-    bids: [
-        {
-            timestamp: "",
-            price: 120,
-            user: ""
-        }
-    ],
-    imageUrl: "https://static.nike.com/a/images/t_PDP_936_v1/f_auto,q_auto:eco/ed95a1f5-5f45-45c1-9a0d-6aed6e0a7cd9/NIKE+AIR+MAX+1.png",
-    auctionEnd: "2024-10-20T15:30",
-    price: 120,
-    type: "Sneakers",
-    name: "Nike Air",
-    size: 42,
-    color: "White"
-},
-{
-    id: 12,
-    bids: [
-        {
-            timestamp: "",
-            price: 130,
-            user: ""
-        }
-    ],
-    imageUrl: "https://pirri.nl/cdn/shop/files/adidas-campus-00s-core-black-adidas-campus-pirri.webp?v=1707683715",
-    auctionEnd: "2024-10-20T15:30",
-    price: 140,
-    type: "Sneakers",
-    name: "Adidas Campus",
-    size: 43,
-    color: "Black"
-}
-];
 
 export function createItem(item) {
-    // Generate a new unique ID across both laptops and sneakers
+    // Generate a new unique ID
     const itemId = generateNewId();
     let itemObj;
-    if (item.type === "Laptop") {
-        itemObj = {
-            id: itemId,
-            bids: [],
-            auctionEnd: item.auctionEnd,
-            price: item.price,
-            type: item.type,
-            name: item.name,
-            processor: item.processor,
-            ram: item.ram,
-            storage: item.storage,
-            graphicsCard: item.graphicsCard,
-            imageUrl: item.imageUrl // Added imageUrl
-        };
-
-        validateLaptop(itemObj);  // Validate fields for Laptop
-        laptops.push(itemObj);    // Add the item to the laptops array
-        return itemId;           // Return new item's id if successfully added
-    } else if (item.type === "Sneakers") {
-        itemObj = {
-            id: itemId,
-            bids: [],
-            auctionEnd: item.auctionEnd,
-            price: item.price,
-            type: item.type,
-            name: item.name,
-            size: item.size,
-            color: item.size,
-            imageUrl: item.imageUrl // Added imageUrl
-        };
-
-        validateSneakers(itemObj);  // Validate fields for Sneakers
-        sneakers.push(itemObj);     // Add the item to the sneakers array
-        return itemId;             // Return new item's id if successfully added
+    if (item.type !== "Laptop") {
+        throw new Error("Unsupported item type");
     }
 
-    throw new Error("Unsupported item type");
+    itemObj = {
+        id: itemId,
+        bids: [],
+        auctionEnd: item.auctionEnd,
+        price: item.price,
+        type: item.type,
+        name: item.name,
+        processor: item.processor,
+        ram: item.ram,
+        storage: item.storage,
+        graphicsCard: item.graphicsCard,
+        imageUrl: item.imageUrl // Added imageUrl
+    };
+
+    validateItem(itemObj);  // Validate fields for Laptop
+    laptops.push(itemObj);    // Add the item to the laptops array
+    return itemId;           // Return new item's id if successfully added
+
+
 }
 
-export function getAllItems(category, filters, like = '', minPrice = 50, maxPrice = 4000) {
+export function getAllItems(filters, like = '', minPrice = 50, maxPrice = 4000) {
     let items;
 
-    // Filter based on category
-    if (category==='laptops') {
-        items = [...laptops];
-    } else if (category==='sneakers') {
-        items = [...sneakers];
-    } else{
-        items = [...laptops, ...sneakers]
-    }
+    items = [...laptops];  // Copy the laptops array
 
     // If no filters and no search query (like) are provided, return all items in the category
     if (Object.keys(filters).length === 0 && !like && minPrice === 50 && maxPrice === 4000) {
@@ -517,16 +460,6 @@ export function getAllItems(category, filters, like = '', minPrice = 50, maxPric
     return items;  // Return the filtered items
 }
 
-//returns all the laptops
-export function getAllLaptops(){
-    return laptops;
-}
-
-//returns all the sneakers
-export function getAllSneakers(){
-    return sneakers;
-}
-
 // Function returns false, meaning no item was found and deleted.
 // If the item exists, it filters the array to remove it, then returns
 // true to indicate the item was successfully deleted.
@@ -536,12 +469,7 @@ export function deleteItem(id) {
     if (foundItem === null) {
         return false;  // Item not found, return false
     }
-
-    if (foundItem.type === "Laptop") {
-        laptops = laptops.filter(item => item.id !== id);  // Filter out the laptop
-    } else if (foundItem.type === "Sneaker") {
-        sneakers = sneakers.filter(item => item.id !== id);  // Filter out the sneaker
-    }
+    laptops = laptops.filter(item => item.id !== id);  // Filter out the laptop
 
     return true;  // Item found and deleted, return true
 }
@@ -562,17 +490,14 @@ export function updateItem(id, updateData) {
 
     // Validate the incoming updateData based on its type
     try {
-        validateLaptop(updateData); // Validate as Laptop
+        validateItem(updateData); // Validate as Laptop
     } catch (error) {
         // Return validation error message without modifying the existing item
         return { message: error.message };
     }
 
-    // Determine the array: is the item a laptop or sneaker?
-    const itemArray = item.type === 'Laptop' ? laptops : item.type === 'Sneakers' ? sneakers : null;
-
-    // Find the index of the item in the correct array
-    const itemIndex = itemArray.findIndex(existingItem => existingItem.id === id);
+    // Find the index of the item in the array
+    const itemIndex = laptops.findIndex(existingItem => existingItem.id === id);
 
     if (itemIndex === -1) {
         return { message: `Item with ID ${id} not found in its array.` };
@@ -582,7 +507,7 @@ export function updateItem(id, updateData) {
     Object.assign(item, updateData);
 
     // Update the item in the correct array
-    itemArray[itemIndex] = item;
+    laptops[itemIndex] = item;
 
     // Return true if successfully updated
     return true;
@@ -622,5 +547,21 @@ export function getLatestBid(productId) {
     }
 
     return bids[bids.length - 1];  // Return the last bid (latest bid)
+}
+
+export function getWonItemsByUserId(userId) {
+    let items = [...laptops];  // Copy the laptops array
+
+    // Filter items where the auction has ended
+    const now = new Date();
+    items = items.filter(item => new Date(item.auctionEnd) < now);
+
+    // Filter items where the last (highest) bid belongs to the given userId
+    items = items.filter(item => {
+        const maxBid = item.bids.reduce((max, bid) => bid.price > max.price ? bid : max, { price: 0 });
+        return maxBid.user === userId;  // Ensure the user of the highest bid matches the given userId
+    });
+
+    return items;  // Return the filtered items
 }
 

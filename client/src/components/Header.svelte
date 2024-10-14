@@ -58,6 +58,10 @@
         router('/admin');  // Navigate to the Admin Dashboard
     }
 
+    function goToWinsPage() {
+        router('/won-auctions');  // Navigate to Won Auctions page
+    }
+
 </script>
 
 <nav>
@@ -68,7 +72,7 @@
     </div>
 
     <!-- Conditionally show search bar or go-back button based on route -->
-    {#if !activeRoute.includes('/laptops/') && !activeRoute.includes('/admin') }
+    {#if !activeRoute.includes('/laptops/') && !activeRoute.includes('/admin') && !activeRoute.includes('/won-auctions') }
         <!-- SearchBar Component in the Middle -->
         <SearchBar bind:query={query} on:Search={handleSearch} />
     {:else}
@@ -88,7 +92,13 @@
             </div>
         {/if}
 
-        <div>Wins</div>
+        <!-- Conditionally display Wins button if user is logged in -->
+        {#if currentUser && !activeRoute.includes('/won-auctions')}
+            <div class="wins-button">
+                <button on:click={goToWinsPage}>Won auctions</button>
+            </div>
+        {/if}
+
         {#if tokenValue}
             <button on:click={logout}>Log Out</button>
         {:else}
@@ -153,7 +163,7 @@
         margin-right: 10px;
     }
 
-    .admin-button button {
+    .wins-button button, .admin-button button {
         padding: 8px 12px;
         background-color: #6200ee;
         color: white;
@@ -162,7 +172,7 @@
         cursor: pointer;
     }
 
-    .admin-button button:hover {
+    .wins-button button:hover, .admin-button button:hover {
         background-color: #3700b3;
     }
 

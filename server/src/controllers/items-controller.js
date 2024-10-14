@@ -1,15 +1,23 @@
-import {createItem, getAllItems, findItemById, updateItem, deleteItem, addBidToTheItem, getLatestBid} from '../models/items-model.js';
+import {
+    createItem,
+    getAllItems,
+    findItemById,
+    updateItem,
+    deleteItem,
+    addBidToTheItem,
+    getLatestBid,
+    getWonItemsByUserId
+} from '../models/items-model.js';
 
-// GET all items (laptops and sneakers)
+// GET all items
 export function getAllItemsController(req, res) {
     const query = req.query;  // Retrieve query parameters
-    const category = query.category;  // Retrieve category parameter
 
     // Retrieve minPrice and maxPrice from query parameters
     const minPrice = query.minPrice ? Number(query.minPrice) : 50;
     const maxPrice = query.maxPrice ? Number(query.maxPrice) : 4000;
-    const { category: _, minPrice: __, maxPrice: ___, like, ...filters } = query;
-    const items = getAllItems(category, filters, like, minPrice, maxPrice);  // Pass category, filters, min and max prices, and search query (like)
+    const {minPrice: __, maxPrice: ___, like, ...filters } = query;
+    const items = getAllItems(filters, like, minPrice, maxPrice);  // Pass category, filters, min and max prices, and search query (like)
     res.status(200).json(items);
 }
 
@@ -24,7 +32,7 @@ export function getItemById(req, res) {
     }
 }
 
-// POST create a new item (Laptop or Sneakers)
+// POST create a new item
 export function createNewItem(req, res) {
     try {
         const newItem = req.body;
@@ -106,6 +114,17 @@ export function streamBids(req, res) {
         clearInterval(intervalId);
         res.end();
     });
+}
+
+export function getWonAuctions(req, res) {
+    const userId = Number(req.params.userId);
+    const items = getWonItemsByUserId(userId);  // Get all items where the winnerId is the user ID
+
+    if (items.length > 0) {
+        res.status(200).json(items);  // Return the won items
+    } else {
+        res.status(404).json({ message: 'No won auctions found for this user.' });
+    }
 }
 
 

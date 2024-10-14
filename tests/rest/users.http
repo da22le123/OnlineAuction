@@ -1,4 +1,6 @@
-###
+// Run test only after restarting the server
+
+### GET all users
 GET {{protocol}}{{host}}:{{port}}/users
 Content-Type: application/json
 Accept: application/json
@@ -7,7 +9,33 @@ Accept: application/json
     client.assert(response.status === 200, "Response status is not 200");
 }) %}
 
-###
+### GET a user by an existing id
+GET {{protocol}}{{host}}:{{port}}/users/1
+Content-Type: application/json
+Accept: application/json
+
+> {% client.test("Request executed successfully", function() {
+    client.assert(response.status === 200, "Response status is not 200");
+
+    client.test("Response body contains a user", function() {
+        client.assert(response.body.id === 1, "User not found in response body");
+    });
+}) %}
+
+### GET a user by a non-existing id
+GET {{protocol}}{{host}}:{{port}}/users/100
+Content-Type: application/json
+Accept: application/json
+
+> {% client.test("Request failed, user not found", function() {
+    client.assert(response.status === 404, "Response status is not 404");
+
+    client.test("Response body contains an error message", function() {
+        client.assert(response.body.message !== undefined && response.body.message === "User not found", "Incorrect error message");
+    });
+}) %}
+
+### POST a new user, should return a token
 POST {{protocol}}{{host}}:{{port}}/users
 Content-Type: application/json
 Accept: application/json
@@ -17,3 +45,31 @@ Accept: application/json
   "password": "password",
   "isAdmin": false
 }
+
+> {% client.test("Request executed successfully, user created", function() {
+    client.assert(response.status === 201, "Response status is not 201");
+
+    client.test("Response body contains a token", function() {
+        client.assert(response.body.token !== undefined, "Token not found in response body");
+    });
+}) %}
+
+### POST a user with the same user name, should return an error message
+POST {{protocol}}{{host}}:{{port}}/users
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "user@gmail.com",
+  "password": "password",
+  "isAdmin": false
+}
+
+> {% client.test("Request failed, user not created", function() {
+        client.assert(response.status === 400, "Response status is not 400");
+
+        client.test("Response body contains an error message", function() {
+            client.assert(response.body.error !== undefined && response.body.error === "Invalid email address or already exists", "Incorrect error message");
+        });
+}) %}
+

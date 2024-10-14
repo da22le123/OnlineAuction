@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllItemsController, getItemById, createNewItem, updateExistingItem, deleteExistingItem, addBid, streamBids} from '../controllers/items-controller.js';
+import { getAllItemsController, getItemById, createNewItem, updateExistingItem, deleteExistingItem, addBid, streamBids, getWonAuctions} from '../controllers/items-controller.js';
 import {isLoggedIn} from "../middleware/isLoggedIn.js";
 import {isAdmin} from "../middleware/isAdmin.js";
 
@@ -25,6 +25,9 @@ router.post('/:id/bids',isLoggedIn, addBid);
 
 //GET a stream of bids /items/:id/bids/stream
 router.get('/:id/bids/stream', streamBids);
+
+//GET won auctions for a user by ID
+router.get('/wins/:userId', isLoggedIn, getWonAuctions);
 
 
 export default router;

@@ -18,16 +18,17 @@ export function generateNewId() {
     return existingIds.length > 0 ? Math.max(...existingIds) + 1 : 1;
 }
 
-export function validateLaptop(item) {
+export function validateItem(item) {
     const requiredFields = ['auctionEnd', 'price', 'name', 'processor', 'ram', 'storage', 'graphicsCard'];
     for (const field of requiredFields) {
         if (!item[field]) {
-            throw new Error(`Missing required field: ${field} for Laptop`);
+            throw new Error(`Missing required field: ${field} for item`);
         }
     }
-
-    if (!isValidUrl(item.imageUrl)) {
-        throw new Error('Invalid image URL for Laptop');
+    if (item.imageUrl) {
+        if (!isValidUrl(item.imageUrl)) {
+            throw new Error('Invalid image URL for Laptop');
+        }
     }
 
     if (isNaN(Date.parse(item.auctionEnd))) {
@@ -35,29 +36,6 @@ export function validateLaptop(item) {
     }
     if (typeof item.price !== 'number' || item.price <= 0) {
         throw new Error('Price must be a positive number');
-    }
-}
-
-export function validateSneakers(item) {
-    const requiredFields = ['auctionEnd', 'price', 'name', 'size', 'color'];
-    for (const field of requiredFields) {
-        if (!item[field]) {
-            throw new Error(`Missing required field: ${field} for Sneakers`);
-        }
-    }
-
-    if (!isValidUrl(item.imageUrl)) {
-        throw new Error('Invalid image URL for Laptop');
-    }
-
-    if (isNaN(Date.parse(item.auctionEnd))) {
-        throw new Error('Invalid auctionEnd date');
-    }
-    if (typeof item.price !== 'number' || item.price <= 0) {
-        throw new Error('Price must be a positive number');
-    }
-    if (typeof item.size !== 'number' || item.size <= 0) {
-        throw new Error('Size must be a positive number');
     }
 }
 
@@ -76,7 +54,7 @@ export function validateBid(bid) {
 
     for (const field of requiredFields) {
         if (!bid[field]) {
-            throw new Error(`Missing required field: ${field} for Sneakers`);
+            throw new Error(`Missing required field: ${field} for bid`);
         }
     }
 

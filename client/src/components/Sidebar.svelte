@@ -2,19 +2,14 @@
     import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher();
 
-    export let category;
     export let filters;
-
 
     let minPrice = 50;
     let maxPrice = 4000;
     let selectedMinPrice = minPrice;
     let selectedMaxPrice = maxPrice;
 
-
-    const categories = ['laptops', 'sneakers'];
-
-    // Define filter options
+    // Define filter options for laptops
     const laptopFilters = {
         name: ['Dell', 'Apple', 'Lenovo', 'HP', 'Acer', 'Asus', 'Microsoft', 'MSI', 'Samsung', 'Razer'],
         processor: ['Intel i5', 'Intel i7', 'AMD Ryzen 5', 'AMD Ryzen 7'],
@@ -23,35 +18,19 @@
         graphicsCard: ['Integrated', 'AMD', 'Nvidia']
     };
 
-    const sneakerFilters = {
-        size: ['41', '42', '43', '44', '45'],
-        color: ['Red', 'Blue', 'Green', 'Black', 'White', 'Yellow']
-    };
-
     // Handle filter change and emit an event to notify the parent
-    function toggleFilter(category, type, value) {
-        // Ensure the category exists in filters (like 'laptops' or 'sneakers')
-        if (!filters[category]) {
-            console.log('filters[category] does not exist')
-            filters[category] = {};  // Initialize category as an empty object if it doesn't exist
+    function toggleFilter(type, value) {
+        if (!filters[type]) {
+            filters[type] = [];
         }
 
-        // Ensure the type (like 'name', 'processor') exists in filters[category]
-        if (!filters[category][type]) {
-            console.log('filters[category][type] does not exist');
-            filters[category][type] = [];  // Initialize the type array if it doesn't exist
-        }
-
-        const index = filters[category][type].indexOf(value);
+        const index = filters[type].indexOf(value);
         if (index === -1) {
-            filters[category][type] = [...filters[category][type], value]; // Add selected value
+            filters[type] = [...filters[type], value];
         } else {
-            filters[category][type] = filters[category][type].filter(item => item !== value); // Remove unselected value
+            filters[type] = filters[type].filter(item => item !== value);
         }
 
-        // console.log('Toggle filters: ', filters); // Log the updated filters
-
-        //Filters ARE updated here
         dispatch('filterChange', filters);  // Emit the event to notify the parent about the filter change
     }
 
@@ -74,16 +53,9 @@
         }
     }
 
-    // Handle category change and emit an event to the parent
-    function handleCategoryChange(event) {
-        const newCategory = event.target.value;
-        dispatch('categoryChange', newCategory);  // Emit the category change event
-    }
-
     // Handle price change emitted by PriceSlider
     function handlePriceChange() {
         filters.price = { selectedMinPrice, selectedMaxPrice };  // Update the price filter in filters
-        console.log(filters.price);
         dispatch('filterChange', filters);  // Emit the event to notify the parent
     }
 
@@ -104,78 +76,49 @@
         </div>
     </div>
 
-    <h3>Filter by Category</h3>
-    <select bind:value={category} on:change={handleCategoryChange}>
-        {#each categories as category}
-            <option value={category}>{category}</option>
+    <div class="filters">
+        <h4>Laptop Filters</h4>
+
+        <label class="subcategory">Name</label>
+        {#each laptopFilters.name as name}
+            <div class="filter-option">
+                <input type="checkbox" id={name} on:change={() => toggleFilter('name', name)}>
+                <label for={name}>{name}</label>
+            </div>
         {/each}
-    </select>
 
-    {#if category === 'laptops'}
-        <div class="filters">
-            <h4>Laptops Filters</h4>
+        <label class="subcategory">Processor</label>
+        {#each laptopFilters.processor as processor}
+            <div class="filter-option">
+                <input type="checkbox" id={processor} on:change={() => toggleFilter('processor', processor)}>
+                <label for={processor}>{processor}</label>
+            </div>
+        {/each}
 
-            <label class="subcategory">Name</label>
-            {#each laptopFilters.name as name}
-                <div class="filter-option">
-                    <input type="checkbox" id={name} on:change={() => toggleFilter('laptops', 'name', name)}>
-                    <label for={name}>{name}</label>
-                </div>
-            {/each}
+        <label class="subcategory">RAM</label>
+        {#each laptopFilters.ram as ram}
+            <div class="filter-option">
+                <input type="checkbox" id={ram} on:change={() => toggleFilter('ram', ram)}>
+                <label for={ram}>{ram}</label>
+            </div>
+        {/each}
 
-            <label class="subcategory">Processor</label>
-            {#each laptopFilters.processor as processor}
-                <div class="filter-option">
-                    <input type="checkbox" id={processor} on:change={() => toggleFilter('laptops', 'processor', processor)}>
-                    <label for={processor}>{processor}</label>
-                </div>
-            {/each}
+        <label class="subcategory">Storage</label>
+        {#each laptopFilters.storage as storage}
+            <div class="filter-option">
+                <input type="checkbox" id={storage} on:change={() => toggleFilter('storage', storage)}>
+                <label for={storage}>{storage}</label>
+            </div>
+        {/each}
 
-            <label class="subcategory">RAM</label>
-            {#each laptopFilters.ram as ram}
-                <div class="filter-option">
-                    <input type="checkbox" id={ram} on:change={() => toggleFilter('laptops', 'ram', ram)}>
-                    <label for={ram}>{ram}</label>
-                </div>
-            {/each}
-
-            <label class="subcategory">Storage</label>
-            {#each laptopFilters.storage as storage}
-                <div class="filter-option">
-                    <input type="checkbox" id={storage} on:change={() => toggleFilter('laptops', 'storage', storage)}>
-                    <label for={storage}>{storage}</label>
-                </div>
-            {/each}
-
-            <label class="subcategory">Graphics Card</label>
-            {#each laptopFilters.graphicsCard as card}
-                <div class="filter-option">
-                    <input type="checkbox" id={card} on:change={() => toggleFilter('laptops', 'graphicsCard', card)}>
-                    <label for={card}>{card}</label>
-                </div>
-            {/each}
-        </div>
-    {:else if category === 'sneakers'}
-        <div class="filters">
-            <h4>Sneakers Filters</h4>
-
-            <label class="subcategory">Size</label>
-            {#each sneakerFilters.size as size}
-                <div class="filter-option">
-                    <input type="checkbox" id={size} on:change={() => toggleFilter('sneakers', 'size', size)}>
-                    <label for={size}>{size}</label>
-                </div>
-            {/each}
-
-            <label class="subcategory">Color</label>
-            {#each sneakerFilters.color as color}
-                <div class="filter-option">
-                    <input type="checkbox" id={color} on:change={() => toggleFilter('sneakers', 'color', color)}>
-                    <label for={color}>{color}</label>
-                </div>
-            {/each}
-        </div>
-    {/if}
+        <label class="subcategory">Graphics Card</label>
+        {#each laptopFilters.graphicsCard as card}
+            <div class="filter-option">
+                <input type="checkbox" id={card} on:change={() => toggleFilter('graphicsCard', card)}>
+                <label for={card}>{card}</label>
+            </div>
+        {/each}
+    </div>
 </div>
 
 <style>
@@ -235,7 +178,6 @@
     .price-range button:hover {
         background-color: #3700b3;
     }
-
 
     label {
         margin-top: 10px;
