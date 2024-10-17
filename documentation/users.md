@@ -3,9 +3,9 @@
 Place the credentials for at least two users in the table below. There should be at least one administrator and one regular user.
 
 
-| Username | Password | Account type |
-|----------|--------|------------|
-| `admin`  | | |
-| `user`   | | |
+| Username | Password | Account type    |
+|----------|----------|-----------------|
+| `admin`  | password | admin@gmail.com |
+| `user`   | password | user@gmail.com  |
 
 

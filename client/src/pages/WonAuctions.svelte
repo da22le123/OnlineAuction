@@ -1,17 +1,26 @@
 <script>
-    import { user } from '../stores/userStore';
     import { token } from '../stores/authStore';
-    import { getCurrentDateNTime} from "../utils/date-time.js";
     import { onMount } from 'svelte';
     import router from 'page';
+    import {getUserDataFromToken} from "../utils/user-utils.js";
 
     let currentUserId;
     let tokenValue;
     let wonAuctions = [];
 
-    user.subscribe(value => {
-        currentUserId = value.id;
+    token.subscribe(value => {
+        tokenValue = value;
     });
+
+    // user.subscribe(value => {
+    //     currentUserId = value.id;
+    // });
+
+    onMount(() => {
+       currentUserId = getUserDataFromToken(tokenValue).userId;
+    });
+
+    $: currentUserId = getUserDataFromToken(tokenValue).userId;
 
     // Fetch the won auctions for the logged-in user
     async function fetchWonAuctions() {
@@ -35,9 +44,7 @@
         }
     });
 
-    token.subscribe(value => {
-        tokenValue = value;
-    });
+
 
 </script>
 

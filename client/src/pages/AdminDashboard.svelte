@@ -11,10 +11,10 @@
 
     import { token } from "../stores/authStore.js";
     import {onMount} from "svelte";
-    import { user } from "../stores/userStore.js";
     import EditAuctionModal from '../components/EditAuctionModal.svelte';
     import AddAuctionModal from '../components/AddAuctionModal.svelte';  // Import the AddAuctionModal component
     import Page from "page";
+    import {getUserDataFromToken} from "../utils/user-utils.js";
 
     let loadedAuctions = [];  // Initialize as an empty array to prevent the {#each} error
     let tokenValue;
@@ -23,9 +23,7 @@
     let showAddModal = false;  // Controls whether the add modal is visible or not
     let selectedAuction = {};  // Store the selected auction for editing
 
-    user.subscribe(value => {
-        currentUser = value;
-    });
+    $: currentUser = getUserDataFromToken();  // Get the current user from the token
 
     token.subscribe(value => {
         tokenValue = value;
@@ -33,6 +31,7 @@
 
     // Does not allow non-admin users to access the Admin Dashboard
     onMount(async () => {
+        currentUser = getUserDataFromToken(tokenValue);
         if (currentUser === null || currentUser === undefined || !currentUser.isAdmin) {
             Page.redirect('/');
         }

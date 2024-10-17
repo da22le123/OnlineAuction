@@ -1,9 +1,9 @@
 <script>
     import {calculateTimeRemaining} from "../utils/date-time.js";
     import {isBidValid, isLoggedIn} from "../utils/validation.js";
-    import {user} from "../stores/userStore.js";
     import {token} from "../stores/authStore.js";
     import {onDestroy, onMount} from "svelte";
+    import {getUserDataFromToken} from "../utils/user-utils.js";
 
     export let params;  // Declare 'params' as a prop
     const productId = params.id;  // Get the product ID from the URL params
@@ -12,6 +12,8 @@
     let currentUser;
     let errorMessage = '';  // To hold any error messages
 
+
+    let currentPrice;
     let newBidAmount = 0;  // To hold the new bid amount
     let timeRemaining = '';  // To hold the countdown string
 
@@ -19,17 +21,15 @@
 
     let bids = [];  // Array to store bids
 
-    onMount(() => {
-        bids=[];
-    });
-
     token.subscribe(value => {
         tokenValue = value;
     });
 
-    user.subscribe(value => {
-        currentUser = value;
+    onMount(() => {
+        currentUser = getUserDataFromToken(tokenValue);
+        bids=[];
     });
+
 
     async function fetchProductById() {
         const response = await fetch(
@@ -78,11 +78,11 @@
             return;
         }
 
-        const currentPrice = product.price;
+        currentPrice = getHighestBid(product);
 
         if (isBidValid(newBidAmount, currentPrice)) {
             // Post the bid to the server
-            postBid(product.id, newBidAmount, currentUser.id);
+            postBid(product.id, newBidAmount, currentUser.userId);
 
 
             errorMessage = "";
@@ -90,6 +90,13 @@
             errorMessage = "Invalid bid amount for product ", product.name;
         }
 
+    }
+
+    function getHighestBid(product) {
+        if (bids.length > 0) {
+            return bids[0].price;
+        }
+        return product.price;
     }
 
     async function postBid(productId, newBidAmount, userIdMadeBy) {
@@ -134,6 +141,7 @@
             // Only add the bid if it's newer than the last bid
             if (bids.length === 0 || newBid.price !== bids[0].price) {
                 bids = [newBid, ...bids];  // Add the new bid to the top of the list
+                currentPrice = newBid.price;  // Update the current price
             }
         };
 

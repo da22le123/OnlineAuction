@@ -3,8 +3,8 @@
     import LoginModal from './LoginModal.svelte';
     import { token } from '../stores/authStore';
     import {currentPath} from "../stores/currentPathStore.js";
-    import { user } from "../stores/userStore.js";
     import router from 'page';
+    import {getUserDataFromToken} from "../utils/user-utils.js";
 
     let currentUser;
     let showModal = false;
@@ -20,10 +20,6 @@
         activeRoute = value;  // Update the activeRoute whenever the route changes
     });
 
-    user.subscribe(value => {
-        currentUser = value;
-    });
-
     let query = "";
     const serverUrl = "http://localhost:3000";
 
@@ -37,13 +33,10 @@
 
     function logout() {
         token.set(null);  // Update store when logging out
-        user.set(null);   // Clear user data
         router('/');      // Optionally redirect to the home page after logging out
     }
 
     async function handleSearch(searchQuery) {
-        console.log("Searching for:", searchQuery);
-
         const response = await fetch(`${serverUrl}/items?searchQuery=${searchQuery}`)
         const data = await response.json();
         console.log(data);
@@ -61,6 +54,8 @@
     function goToWinsPage() {
         router('/won-auctions');  // Navigate to Won Auctions page
     }
+
+    $: currentUser = getUserDataFromToken(tokenValue);
 
 </script>
 

@@ -11,3 +11,4 @@ export function isLoggedIn() {
 export function isBidValid(bid, currentPrice) {
     return bid > currentPrice;
 }
+

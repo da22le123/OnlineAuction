@@ -9,6 +9,12 @@ export let users = [
         email: "admin@gmail.com",
         password: "$2b$10$yI6QNTcdL1A2ftjX4g2hDegrhbyaN80FA1ur9Mf9jqaW.FPE8tQC6",
         isAdmin: true
+    },
+    {
+        id: 2,
+        email: "user@gmail.com",
+        password: "$2b$10$yI6QNTcdL1A2ftjX4g2hDegrhbyaN80FA1ur9Mf9jqaW.FPE8tQC6",
+        isAdmin: false
     }
 ];
 

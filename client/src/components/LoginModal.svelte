@@ -1,6 +1,5 @@
 <script>
     import { token } from '../stores/authStore'; // Import the token store
-    import { user } from '../stores/userStore'; // Import the user store
 
     export let showModal = false;
     export let closeModal;
@@ -33,7 +32,7 @@
             }
 
             token.set(data.token);  // Handle the JWT token here.
-            user.set(userData); // Set the user data
+
 
             errorMessage = '';  // Clear any previous error message
             closeModal();  // Close the modal upon successful login
@@ -91,7 +90,6 @@
             }
 
             token.set(data.token);  // Handle the JWT token here.
-            user.set(userData);  // Set the user data
 
             console.log(data.token);
             closeModal();  // Close the modal upon successful login

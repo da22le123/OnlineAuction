@@ -8,7 +8,6 @@
 
     async function fetchProducts() {
         const queryParams = buildQueryParams(filters);
-        console.log(queryParams)
         const response = await fetch(
             `http://localhost:3000/items?${queryParams}`,
             {
