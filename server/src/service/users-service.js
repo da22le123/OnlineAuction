@@ -1,4 +1,4 @@
-import {getAllUsers} from "../models/user-model.js";
+import {getAllUsers} from "../model/user-model.js";
 
 // Function to generate a new ID based on the lowest available or the next highest
 export function generateNewId() {

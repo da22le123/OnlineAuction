@@ -91,7 +91,6 @@
 
             token.set(data.token);  // Handle the JWT token here.
 
-            console.log(data.token);
             closeModal();  // Close the modal upon successful login
 
             errorMessage = '';  // Clear any previous error message

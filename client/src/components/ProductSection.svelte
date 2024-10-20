@@ -22,8 +22,6 @@
 
         const now = new Date();
         products = fetchedProducts.filter(product => new Date(product.auctionEnd) > now);
-
-        console.log(products);
     }
 
     let filters = {

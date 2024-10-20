@@ -68,6 +68,7 @@
 
     .product-card:hover {
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        trasnform: translateY(-8px);
     }
 
     .product-image {

@@ -1,4 +1,4 @@
-import {getAllUsers, createUser, getUserByEmail, findUserById} from '../models/user-model.js';
+import {getAllUsers, createUser, getUserByEmail, findUserById} from '../model/user-model.js';
 import {generateToken} from "../service/auth-service.js";
 
 export function getAllUsersController(req, res) {

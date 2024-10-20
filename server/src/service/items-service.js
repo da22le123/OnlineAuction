@@ -1,4 +1,4 @@
-import {getAllItems} from "../models/items-model.js";
+import {getAllItems} from "../model/items-model.js";
 
 // Function to generate a new ID based on the lowest available or the next highest
 export function generateNewId() {

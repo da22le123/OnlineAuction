@@ -39,7 +39,6 @@
     async function handleSearch(searchQuery) {
         const response = await fetch(`${serverUrl}/items?searchQuery=${searchQuery}`)
         const data = await response.json();
-        console.log(data);
     }
 
     // Navigate back to the product section
@@ -62,8 +61,7 @@
 <nav>
     <!-- Left Section with Title and Subtitle -->
     <div class="left">
-        <h3 class="title">Title</h3>
-        <span class="subtitle">Subtitle</span>
+        <h3 class="title">OnlineAuction </h3>
     </div>
 
     <!-- Conditionally show search bar or go-back button based on route -->

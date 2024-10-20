@@ -48,14 +48,12 @@
     // Handle adding a new auction
     function addAuction() {
         showAddModal = true;  // Open the modal
-        console.log('Add auction');
     }
 
     // Function to handle Editing of auctions
     function editAuction(auctionId) {
         selectedAuction = loadedAuctions.find(auction => auction.id === auctionId);
         showEditModal = true;  // Open the modal
-        console.log('Edit auction', auctionId);
     }
 
     // Close edit modal
@@ -127,7 +125,6 @@
         if (response.ok) {
             // re-fetch the auctions after deleting an item
             loadedAuctions = await fetchAuctions();
-            console.log(`Auction with ID ${auctionId} has been deleted.`);
         } else {
             console.error('Failed to delete auction');
         }

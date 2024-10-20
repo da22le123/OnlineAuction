@@ -161,7 +161,6 @@
     // Ensure SSE closes properly
     function cleanUpSSE() {
         if (eventSource) {
-            console.log('Closing EventSource onDestroy');
             eventSource.close();
         }
     }

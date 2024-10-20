@@ -7,7 +7,7 @@ import {
     addBidToTheItem,
     getLatestBid,
     getWonItemsByUserId
-} from '../models/items-model.js';
+} from '../model/items-model.js';
 
 // GET all items
 export function getAllItemsController(req, res) {

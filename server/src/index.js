@@ -15,9 +15,6 @@ app.use("/auth", auth);
 app.use("/items", itemsRouter);
 app.use("/users", usersRouter);
 
-// Middleware to parse incoming JSON requests
-
-
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`App listening on port ${port}`);
 });

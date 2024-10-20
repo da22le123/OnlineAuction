@@ -1,4 +1,4 @@
-import {getUserByEmail} from "../models/user-model.js";
+import {getUserByEmail} from "../model/user-model.js";
 import bcrypt from "bcrypt";
 import {generateToken} from "../service/auth-service.js";
 
