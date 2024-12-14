@@ -3,7 +3,7 @@
     import Sidebar from "./Sidebar.svelte";
     import { searchQuery } from '../stores/searchStore';
 
-    let products = [];
+    let products = [];  // To hold the fetched products
     let currentSearch = '';  // To hold the search query
 
     async function fetchProducts() {
@@ -19,9 +19,10 @@
         );
 
         let fetchedProducts = await response.json();
-
         const now = new Date();
-        products = fetchedProducts.filter(product => new Date(product.auctionEnd) > now);
+        let filtered = fetchedProducts.filter(product => new Date(product.auctionEnd) > now);
+
+        return filtered;
     }
 
     let filters = {
@@ -77,7 +78,9 @@
     });
 
     // Automatically refetch products when filters, or searchQuery changes
-    $: fetchProducts();  // This will reactively run when filters or currentSearch change
+    $: (async () => {
+        products = await fetchProducts();
+    })();  // This will reactively run when filters or currentSearch change
 </script>
 
 <div class="product-container">

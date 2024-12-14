@@ -1,4 +1,11 @@
 import {generateNewId, validateBid, validateItem} from "../service/items-service.js";
+
+function getRandomDateInJanuary2025() {
+    const start = new Date(2025, 0, 1); // January 1, 2025
+    const end = new Date(2025, 0, 31, 23, 59, 59); // January 31, 2025, 23:59:59
+    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+}
+
 export let laptops = [
     {
         id: 1,
@@ -15,7 +22,7 @@ export let laptops = [
             }
         ],
         imageUrl: "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/xps-notebooks/9345/media-gallery/touch/gray/notebook-xps-13-9345-t-gray-gallery-2.psd?fmt=png-alpha&pscan=auto&scl=1&hei=402&wid=679&qlt=100,1&resMode=sharp2&size=679,402&chrss=full",
-        auctionEnd: "2024-11-20T16:30",
+        auctionEnd: getRandomDateInJanuary2025().toISOString(),
         price: 1500,
         type: "Laptop",
         name: "Dell",
@@ -34,7 +41,7 @@ export let laptops = [
             }
         ],
         imageUrl: "https://sg-files.apjonlinecdn.com/landingpages/category-family/hp-laptops-family/images/w100_hero_mobile_v2.jpg",
-        auctionEnd: "2024-11-20T15:30",
+        auctionEnd: getRandomDateInJanuary2025().toISOString(),
         price: 1200,
         type: "Laptop",
         name: "HP",
@@ -53,7 +60,7 @@ export let laptops = [
             }
         ],
         imageUrl: "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/mba13-midnight-select-202402?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1708367688034",
-        auctionEnd: "2024-11-20T15:30",
+        auctionEnd: getRandomDateInJanuary2025().toISOString(),
         price: 1300,
         type: "Laptop",
         name: "Apple",
@@ -72,7 +79,7 @@ export let laptops = [
             }
         ],
         imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvwiAhqTEXWzMYQnrbPXxgHG5QHdt23Yrpyw&s",
-        auctionEnd: "2024-11-20T15:30",
+        auctionEnd: getRandomDateInJanuary2025().toISOString(),
         price: 1400,
         type: "Laptop",
         name: "Lenovo",
@@ -91,7 +98,7 @@ export let laptops = [
             }
         ],
         imageUrl: "https://www.asus.com/media/Odin/Websites/global/Series/15.png",
-        auctionEnd: "2024-11-20T15:30",
+        auctionEnd: getRandomDateInJanuary2025().toISOString(),
         price: 1250,
         type: "Laptop",
         name: "Asus",
@@ -110,7 +117,7 @@ export let laptops = [
             }
         ],
         imageUrl: "https://media.s-bol.com/Ny1o1AmGm30m/MY0Rm1/1200x844.jpg",
-        auctionEnd: "2024-11-20T15:30",
+        auctionEnd: getRandomDateInJanuary2025().toISOString(),
         price: 1350,
         type: "Laptop",
         name: "Acer",
@@ -129,7 +136,7 @@ export let laptops = [
             }
         ],
         imageUrl: "https://www.notebookcheck.nl/uploads/tx_nbc2/Surface_Laptop_4_13.jpg",
-        auctionEnd: "2024-11-20T15:30",
+        auctionEnd: getRandomDateInJanuary2025().toISOString(),
         price: 1470,
         type: "Laptop",
         name: "Microsoft",
@@ -148,7 +155,7 @@ export let laptops = [
             }
         ],
         imageUrl: "https://i5.walmartimages.com/seo/MSI-GL63-Gaming-Laptop-15-6-Intel-Core-i7-8750H-NVIDIA-GeForce-GTX-1050-8gb-RAM-256gb-SSD-1TB-HDD_3a04f0fc-6fed-4b52-912c-11317e493ad1_1.9e46d617254b76bff5a4cda944922f78.jpeg",
-        auctionEnd: "2024-11-20T15:30",
+        auctionEnd: getRandomDateInJanuary2025().toISOString(),
         price: 1000,
         type: "Laptop",
         name: "MSI",
@@ -167,7 +174,7 @@ export let laptops = [
             }
         ],
         imageUrl: "https://img.informatique.nl/750/24748501.jpg",
-        auctionEnd: "2024-11-20T15:30",
+        auctionEnd: getRandomDateInJanuary2025().toISOString(),
         price: 980,
         type: "Laptop",
         name: "Samsung",
@@ -186,7 +193,7 @@ export let laptops = [
             }
         ],
         imageUrl: "https://www.notebookcheck.nl/uploads/tx_nbc2/Blade_15_Fall_2018_Base_Model_Render_13.png",
-        auctionEnd: "2024-11-20T15:30",
+        auctionEnd: getRandomDateInJanuary2025().toISOString(),
         price: 1510,
         type: "Laptop",
         name: "Razer",
@@ -210,7 +217,7 @@ export let laptops = [
             }
         ],
         imageUrl: "https://ssl-product-images.www8-hp.com/digmedialib/prodimg/lowres/c06375981.png",
-        auctionEnd: "2024-10-30T15:00",
+        auctionEnd: getRandomDateInJanuary2025().toISOString(),
         price: 1300,
         type: "Laptop",
         name: "HP",
@@ -234,7 +241,7 @@ export let laptops = [
             }
         ],
         imageUrl: "https://img.global.news.samsung.com/global/wp-content/uploads/2017/01/PressRelease_Notebook9_Main_1.jpg",
-        auctionEnd: "2024-10-02T14:00:00Z",
+        auctionEnd: getRandomDateInJanuary2025().toISOString(),
         price: 1550,
         type: "Laptop",
         name: "Samsung",
@@ -258,7 +265,7 @@ export let laptops = [
             }
         ],
         imageUrl: "https://m.media-amazon.com/images/I/61FETFgD3hL.jpg",
-        auctionEnd: "2024-10-28T16:00",
+        auctionEnd: getRandomDateInJanuary2025().toISOString(),
         price: 1200,
         type: "Laptop",
         name: "Acer",
@@ -282,7 +289,7 @@ export let laptops = [
             }
         ],
         imageUrl: "https://www.notebookcheck.nl/fileadmin/Notebooks/Lenovo/ThinkPad_E16_G1_21JUS08X00/IMG_0312.JPG",
-        auctionEnd: "2024-10-19T12:00",
+        auctionEnd: getRandomDateInJanuary2025().toISOString(),
         price: 1050,
         type: "Laptop",
         name: "Lenovo",
@@ -306,7 +313,7 @@ export let laptops = [
             }
         ],
         imageUrl: "https://http2.mlstatic.com/D_NQ_NP_797680-MLA51356381245_082022-O.webp",
-        auctionEnd: "2024-11-18T18:00",
+        auctionEnd: getRandomDateInJanuary2025().toISOString(),
         price: 1850,
         type: "Laptop",
         name: "Apple",
@@ -330,7 +337,7 @@ export let laptops = [
             }
         ],
         imageUrl: "https://i.dell.com/is/image/DellContent/content/dam/ss2/products/laptops-and-2-in-1s/latitude/13-9330-touch/media-gallery/2in1/notebook-latitude-13-9330-gray-gallery-8.psd?fmt=png-alpha&pscan=auto&scl=1&hei=402&wid=625&qlt=100,1&resMode=sharp2&size=625,402&chrss=full",
-        auctionEnd: "2024-10-22T17:00",
+        auctionEnd: getRandomDateInJanuary2025().toISOString(),
         price: 1600,
         type: "Laptop",
         name: "Dell",
@@ -354,7 +361,7 @@ export let laptops = [
             }
         ],
         imageUrl: "https://laptopmedia.com/wp-content/uploads/2021/01/Acer-Aspire-3_A317-52_05-e1610455525412.jpg",
-        auctionEnd: "2024-10-25T19:30",
+        auctionEnd: getRandomDateInJanuary2025().toISOString(),
         price: 1450,
         type: "Laptop",
         name: "Acer",
@@ -378,7 +385,7 @@ export let laptops = [
             }
         ],
         imageUrl: "https://dlcdnwebimgs.asus.com/gain/be4de3c3-e364-4b45-b40b-ec4ec50e0c2b/",
-        auctionEnd: "2024-11-15T13:00",
+        auctionEnd: getRandomDateInJanuary2025().toISOString(),
         price: 1700,
         type: "Laptop",
         name: "Asus",

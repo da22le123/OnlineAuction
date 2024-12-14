@@ -5,6 +5,7 @@ The structure of the backend (such as explanation of appliance of separation of 
 
 ## Back-End
 
+
 ### Structure
 
 The backend is built using Node.js with Express.js. The backend has the following architecture:
