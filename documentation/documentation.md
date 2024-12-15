@@ -5,6 +5,11 @@ The structure of the backend (such as explanation of appliance of separation of 
 
 ## Back-End
 
+Remember to add .env file to the root of the server directory with the following content:
+    
+```
+JWT_SECRET=your_secret
+```
 
 ### Structure
 
